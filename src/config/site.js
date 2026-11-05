@@ -4,7 +4,7 @@
  */
 
 /** Digits with the country code and no plus sign, such as 6281234567890. */
-export const WHATSAPP_NUMBER = '';
+export const WHATSAPP_NUMBER = '6281277989803';
 
 export const COMMUNITY_CHANNELS = [
   { name: 'Discord', url: '', note: 'Diskusi, review kode, dan belajar bareng.' },

@@ -261,7 +261,7 @@ where p.id is null;
 - **Profiles can't be edited in the UI.** The database allows username updates, but no screen offers one, and password reset is not built.
 - **Seed data lives in two places.** `src/data/seedServices.js` and `supabase/seed.sql` hold the same rows, so edit both together.
 - **Seeded services have no images.** `image_url` is null and cards draw a generated pattern. A real URL in that column replaces the pattern.
-- **Hosting needs an SPA fallback.** Rewrite unknown paths to `index.html`, or direct links such as `/dashboard` will return 404.
+- **Hosting needs an SPA fallback.** Rewrite unknown paths to `index.html`, or direct links such as `/dashboard` will return 404. The GitHub Pages workflow in `.github/workflows/deploy.yml` does this by copying `index.html` to `404.html`, and sets `BASE_PATH` to the repo name. It reads `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from the repo's Actions variables, and without them the live site runs in demo mode.
 - **Fonts load from Google Fonts.** Offline, the app falls back to system fonts.
 - **The site is in two languages.** The landing page is Indonesian, while the app pages and the seeded catalog are English.
 - **The consultation form sends nothing by itself.** It hands the brief to WhatsApp once `WHATSAPP_NUMBER` is set, and nothing is stored.

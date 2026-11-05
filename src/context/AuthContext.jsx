@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
       password,
       options: {
         data: username ? { username } : undefined,
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: new URL(import.meta.env.BASE_URL, window.location.origin).href,
       },
     });
     if (error) throw error;
