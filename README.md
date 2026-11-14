@@ -1,8 +1,6 @@
 # JokiWebApp
 
-A web development and project service site in Indonesian, built with React, Vite, Tailwind CSS and Supabase. `/` is the landing page. Signed-in visitors can browse website templates at `/templates`.
-
-Supabase provides the accounts. Without it the site still runs, but login explains that accounts aren't available yet, and the template page can't be opened.
+A web development and project service site in Indonesian, built with React, Vite and Tailwind CSS. `/` is the landing page, and `/templates` lets visitors browse website templates. There is no backend or login: every page is static, and orders and consultations go out over WhatsApp.
 
 ## Before you launch
 
@@ -21,15 +19,12 @@ The site will not invent facts about your business, so these need your input:
 
 ```text
 JokiWebApp/
-├── .env.example                 Template for the two Supabase variables
 ├── index.html                   Entry page, Google Fonts
 ├── tailwind.config.js           Colour, font and elevation tokens
 ├── vite.config.js
 ├── vercel.json                  SPA rewrite for Vercel
 ├── public/
-├── supabase/
-│   ├── migrations/0001_init.sql Tables, signup trigger, RLS, grants
-│   └── seed.sql                 Catalog rows from the earlier app (unused by the site now)
+├── supabase/                    Schema from the earlier app's database (unused by the site now)
 └── src/
     ├── main.jsx                 Providers and Animate.css import
     ├── App.jsx                  Routes and page titles
@@ -40,22 +35,16 @@ JokiWebApp/
     ├── config/
     │   ├── site.js              WhatsApp, community and social links
     │   └── brand.js             App name and tagline
-    ├── lib/SupabaseClient.js    Client and demo mode detection
-    ├── context/
-    │   ├── AuthContext.jsx      Session, sign in/up/out, login modal state
-    │   └── ToastContext.jsx     Notifications
+    ├── context/ToastContext.jsx Notifications
     ├── hooks/                   Active section, scroll reveal, reduced motion
     ├── components/
     │   ├── landing/             SiteNav, Hero, CodeWindow, the sections, ConsultModal, SiteFooter, ScrambleText
-    │   ├── shell/               Logo, AccountControl, SitePage, glow
-    │   ├── LoginModal.jsx       Email and password auth
-    │   ├── TemplateLink.jsx     Link to /templates that asks for login first
-    │   ├── SignInGate.jsx       Shown in place of a page that needs an account
+    │   ├── shell/               Logo, SitePage, glow
     │   ├── Modal.jsx            Shared dialog
-    │   └── Notice.jsx           Empty, error and signed-out panels
+    │   └── Notice.jsx           Empty and error panels
     └── pages/
         ├── Landing.jsx          /
-        ├── Templates.jsx        /templates, signed in only
+        ├── Templates.jsx        /templates
         └── NotFound.jsx
 ```
 
@@ -82,23 +71,6 @@ corepack pnpm@latest install
 corepack pnpm@latest run dev
 ```
 
-## Connect Supabase
-
-1. Create a project at [supabase.com](https://supabase.com).
-2. `cp .env.example .env` and fill in `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from **Project Settings > API**. Never use the `service_role` key here: every `VITE_` variable ends up in the browser bundle. Restart the dev server afterwards.
-3. In **SQL Editor**, run `supabase/migrations/0001_init.sql`. It creates the `profiles` table and the signup trigger that fills it. It is safe to run again.
-4. Under **Authentication > Sign In / Providers**, make sure **Email** is enabled. Under **Authentication > URL Configuration**, set **Site URL** to the app's address and add any others under **Redirect URLs**.
-5. Decide whether to keep **Confirm email** on. With it on, new users must open the link in their inbox before signing in, and the login form tells them so.
-
-The default Supabase email service has a low hourly limit, so set up custom SMTP before launch.
-
-## How login works
-
-- The navbar's **Masuk** button opens the login form. Once signed in, it becomes the account's initials and a sign-out button.
-- **Mulai cari template website**, and every other link to `/templates`, goes through `TemplateLink`. Signed-in visitors go straight there. Signed-out visitors get the login form first and land on `/templates` once they're in.
-- Opening `/templates` directly while signed out shows `SignInGate` instead of the templates.
-- Supabase's English error messages are translated in `LoginModal.jsx`. Add a line to `AUTH_ERRORS` for any new message that shows up in English.
-
 ## Design system
 
 Dark glass on near-black, lit by neon green and cyan. Tokens live as CSS variables at the top of `src/index.css`, and `tailwind.config.js` maps them to utility names.
@@ -122,8 +94,7 @@ The landing page makes no claims it can't back: no client counts, ratings, testi
 ## Known limitations
 
 - **Templates are concepts.** The previews are drawings, not live demos, and ordering one opens WhatsApp with the template's name. Nothing is stored.
-- **The earlier app's tables are still in the database.** `services` and `orders` are no longer read by the site. They are left in place so no data is lost; drop them in Supabase if you don't need them.
-- **Password reset is not built.** Neither is editing a username after signup.
-- **Hosting needs an SPA fallback.** Rewrite unknown paths to `index.html`, or direct links such as `/templates` return 404. `vercel.json` does this on Vercel. The GitHub Pages workflow in `.github/workflows/deploy.yml` copies `index.html` to `404.html` and sets `BASE_PATH` to the repo name. It reads `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` from the repo's Actions variables.
+- **The earlier Supabase project still exists.** The site no longer connects to it. Its tables, accounts and the `VITE_SUPABASE_*` variables in GitHub Actions and Vercel are left in place so nothing is lost; delete them if you don't need them.
+- **Hosting needs an SPA fallback.** Rewrite unknown paths to `index.html`, or direct links such as `/templates` return 404. `vercel.json` does this on Vercel. The GitHub Pages workflow in `.github/workflows/deploy.yml` copies `index.html` to `404.html` and sets `BASE_PATH` to the repo name.
 - **Fonts load from Google Fonts.** Offline, the site falls back to system fonts.
 - **The consultation form sends nothing by itself.** It hands the brief to WhatsApp once `WHATSAPP_NUMBER` is set.

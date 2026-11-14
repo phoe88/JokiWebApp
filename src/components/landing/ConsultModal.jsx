@@ -1,10 +1,10 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Check, Copy, MessagesSquare, Send } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '../../config/site';
 import { CONSULT_TIMELINES, SERVICES } from '../../content/landing';
 import { useToast } from '../../context/ToastContext';
 import Modal from '../Modal';
-import TemplateLink from '../TemplateLink';
 
 const MIN_BRIEF_LENGTH = 10;
 
@@ -87,7 +87,9 @@ function ConsultForm() {
               {copied ? <Check aria-hidden className="size-4 text-live" /> : <Copy aria-hidden className="size-4" />}
               {copied ? 'Tersalin' : 'Salin Ringkasan'}
             </button>
-            <TemplateLink className="btn btn-primary flex-1">Lihat Template</TemplateLink>
+            <Link to="/templates" className="btn btn-primary flex-1">
+              Lihat Template
+            </Link>
           </div>
         </>
       )}

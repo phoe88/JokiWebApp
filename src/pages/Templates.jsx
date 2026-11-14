@@ -1,16 +1,13 @@
 import { useDeferredValue, useMemo, useState } from 'react';
-import { Info, LayoutTemplate, LoaderCircle, Search, SearchX, Send, X } from 'lucide-react';
+import { Info, LayoutTemplate, Search, SearchX, Send, X } from 'lucide-react';
 import Modal from '../components/Modal';
 import Notice from '../components/Notice';
-import SignInGate from '../components/SignInGate';
 import GlowCard from '../components/landing/GlowCard';
 import ProjectMockup from '../components/landing/ProjectMockup';
 import ScrambleText from '../components/landing/ScrambleText';
 import SitePage from '../components/shell/SitePage';
-import { displayNameOf } from '../components/shell/AccountControl';
 import { WHATSAPP_NUMBER } from '../config/site';
 import { ALL_TEMPLATES, TEMPLATE_CATEGORIES, TEMPLATES } from '../content/templates';
-import { useAuth } from '../context/AuthContext';
 
 const searchableText = ({ name, category, summary, pages, features, stack }) =>
   [name, category, summary, ...pages, ...features, ...stack].join(' ').toLowerCase();
@@ -124,7 +121,7 @@ function TemplateDetails({ template, onClose }) {
   );
 }
 
-function TemplateBrowser({ user }) {
+export default function Templates() {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState(ALL_TEMPLATES);
   const [selected, setSelected] = useState(null);
@@ -138,14 +135,14 @@ function TemplateBrowser({ user }) {
   };
 
   return (
-    <>
+    <SitePage>
       <header className="max-w-2xl">
         <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
           Cari template website
         </h1>
         <p className="mt-3 text-base leading-relaxed text-ink-muted sm:text-lg">
-          Halo, <span className="text-ink">{displayNameOf(user)}</span>. Pilih tampilan yang paling dekat dengan
-          kebutuhan kamu, lalu kami sesuaikan isinya.
+          Pilih tampilan yang paling dekat dengan kebutuhan kamu, lalu kami sesuaikan isinya dengan brand dan
+          konten kamu.
         </p>
       </header>
 
@@ -227,28 +224,6 @@ function TemplateBrowser({ user }) {
       </p>
 
       <TemplateDetails template={selected} onClose={() => setSelected(null)} />
-    </>
-  );
-}
-
-export default function Templates() {
-  const { user, loading } = useAuth();
-
-  return (
-    <SitePage>
-      {loading ? (
-        <p className="flex items-center gap-2 text-sm text-ink-dim">
-          <LoaderCircle aria-hidden className="size-4 animate-spin" />
-          Memeriksa sesi
-        </p>
-      ) : user ? (
-        <TemplateBrowser user={user} />
-      ) : (
-        <SignInGate
-          title="Masuk untuk mencari template"
-          body="Template website hanya bisa dilihat setelah kamu masuk. Belum punya akun? Daftar gratis, cukup dengan email."
-        />
-      )}
     </SitePage>
   );
 }

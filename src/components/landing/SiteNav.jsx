@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { LayoutTemplate, Menu, X } from 'lucide-react';
 import { NAV_SECTIONS } from '../../content/landing';
 import { useActiveSection } from '../../hooks/useActiveSection';
-import TemplateLink from '../TemplateLink';
-import AccountControl from '../shell/AccountControl';
 import Logo from '../shell/Logo';
 import ScrambleText from './ScrambleText';
 import SectionLink from './SectionLink';
@@ -60,13 +59,10 @@ function MobileDrawer({ open, onClose }) {
           </ul>
         </nav>
 
-        <div className="flex flex-col gap-2">
-          <AccountControl block onAction={onClose} />
-          <TemplateLink onClick={onClose} className="btn btn-primary w-full">
-            <LayoutTemplate aria-hidden className="size-4" />
-            {CTA_LABEL}
-          </TemplateLink>
-        </div>
+        <Link to="/templates" onClick={onClose} className="btn btn-primary w-full">
+          <LayoutTemplate aria-hidden className="size-4" />
+          {CTA_LABEL}
+        </Link>
       </div>
     </dialog>
   );
@@ -94,12 +90,9 @@ export default function SiteNav() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2 lg:ml-0">
-          <div className="hidden sm:flex">
-            <AccountControl />
-          </div>
-          <TemplateLink className="btn btn-primary glitch-host hidden px-4 py-2 sm:inline-flex">
+          <Link to="/templates" className="btn btn-primary glitch-host hidden px-4 py-2 sm:inline-flex">
             <ScrambleText text={CTA_LABEL} />
-          </TemplateLink>
+          </Link>
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}

@@ -1,6 +1,6 @@
+import { Link } from 'react-router-dom';
 import { ArrowRight, Check } from 'lucide-react';
 import { SERVICES } from '../../content/landing';
-import TemplateLink from '../TemplateLink';
 import GlowCard from './GlowCard';
 import Reveal from './Reveal';
 import ScrambleText from './ScrambleText';
@@ -15,10 +15,10 @@ export default function ServicesSection() {
           body="Dari web baru sampai perbaikan project yang macet, pilih bantuan yang kamu butuhkan."
         />
         <Reveal>
-          <TemplateLink className="btn btn-ghost glitch-host">
+          <Link to="/templates" className="btn btn-ghost glitch-host">
             <ScrambleText text="Lihat Template" />
             <ArrowRight aria-hidden className="size-4" />
-          </TemplateLink>
+          </Link>
         </Reveal>
       </div>
 

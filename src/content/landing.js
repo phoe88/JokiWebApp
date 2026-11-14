@@ -18,8 +18,6 @@ export const NAV_SECTIONS = [
   { id: 'faq', label: 'FAQ' },
 ];
 
-export const HERO_STACK = ['React', 'Tailwind CSS', 'Supabase', 'PHP', 'PostgreSQL', 'Node.js'];
-
 export const SERVICES = [
   {
     id: 'fullstack',

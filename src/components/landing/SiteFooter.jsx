@@ -1,8 +1,7 @@
+import { Link } from 'react-router-dom';
 import { APP_NAME } from '../../config/brand';
 import { COMMUNITY_CHANNELS, SOCIAL_LINKS } from '../../config/site';
 import { NAV_SECTIONS } from '../../content/landing';
-import { useAuth } from '../../context/AuthContext';
-import TemplateLink from '../TemplateLink';
 import Logo from '../shell/Logo';
 import SectionLink from './SectionLink';
 
@@ -18,7 +17,6 @@ function FooterColumn({ title, children }) {
 }
 
 export default function SiteFooter() {
-  const { user, loading, openLogin } = useAuth();
   const handles = [...COMMUNITY_CHANNELS, ...SOCIAL_LINKS].filter(({ url }) => url);
 
   return (
@@ -44,15 +42,10 @@ export default function SiteFooter() {
 
         <FooterColumn title="Template">
           <li>
-            <TemplateLink className={linkClass}>Cari Template</TemplateLink>
+            <Link to="/templates" className={linkClass}>
+              Cari Template
+            </Link>
           </li>
-          {!loading && !user && (
-            <li>
-              <button type="button" onClick={() => openLogin()} className={linkClass}>
-                Masuk atau Daftar
-              </button>
-            </li>
-          )}
         </FooterColumn>
 
         <FooterColumn title="Komunitas">

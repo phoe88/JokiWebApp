@@ -247,18 +247,6 @@
     opacity: 1;
   }
 
-  .segment {
-    @apply inline-flex shrink-0 items-center gap-0.5 rounded-full p-1;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--glass-line);
-  }
-
-  .segment .pill {
-    @apply px-3 py-1 text-[13px];
-    background: transparent;
-    border-color: transparent;
-  }
-
   /* Badges and small marks */
   .badge {
     @apply inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold;
@@ -423,15 +411,6 @@
 /* Sidebar links: an icon rail with tooltips, and labelled rows from xl */
 
 /* Bottom tab bar below lg */
-.tabbar {
-  position: fixed;
-  right: 0.75rem;
-  bottom: calc(0.625rem + env(safe-area-inset-bottom));
-  left: 0.75rem;
-  z-index: 40;
-  height: var(--tabbar-height);
-  padding: 0.375rem;
-}
 
 /* A dot that breathes while something is live */
 .live-dot {
@@ -582,6 +561,33 @@ html:has(.landing) {
   font-family: 'Fira Code', ui-monospace, monospace;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-line);
+}
+
+/* Hero stack: brand logo buttons that open each technology's site */
+.stack-chip {
+  @apply inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-ink-muted;
+  font-family: 'Fira Code', ui-monospace, monospace;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-line);
+  transition: color 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.stack-chip svg {
+  color: var(--brand);
+}
+
+.stack-chip:hover,
+.stack-chip:focus-visible {
+  color: rgb(var(--ink));
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  border-color: color-mix(in srgb, var(--brand) 55%, transparent);
+  box-shadow: 0 0 18px -6px var(--brand);
+  transform: translateY(-2px);
+}
+
+.stack-chip:active {
+  transform: translateY(0) scale(0.97);
 }
 
 .section-rule {
@@ -1069,11 +1075,11 @@ html:has(.landing) {
   .btn,
   .icon-btn,
   .pill,
-  .segment,
   .badge,
   .demo-tag,
   .field,
   .search-shell,
+  .stack-chip,
   .tech-tag {
     border: 1px solid CanvasText;
     -webkit-backdrop-filter: none;
