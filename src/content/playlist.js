@@ -1,4 +1,15 @@
 /**
+ * The song at the top of the playlist, played from YouTube. Change `videoId` (the
+ * part after watch?v= in a YouTube link) to feature a different song.
+ */
+export const FEATURED_SONG = {
+  videoId: 'zyLmavBAY7k',
+  title: 'Teh Hijau',
+  channel: 'TULUS',
+  label: 'Official Music Video',
+};
+
+/**
  * The coding playlist. Every track is original music synthesised in the browser
  * (see src/lib/synth.js), so there are no audio files or licences involved.
  *

@@ -3,9 +3,11 @@ import { Heart, Music, Pause, Play } from 'lucide-react';
 import { TRACKS } from '../../content/playlist';
 import { useToast } from '../../context/ToastContext';
 import { useFavoriteTracks, usePlaylistPlayer } from '../../hooks/usePlaylistPlayer';
+import { useYouTubePlayer } from '../../hooks/useYouTubePlayer';
 import Modal from '../Modal';
 import Reveal from './Reveal';
 import SectionHeading from './SectionHeading';
+import SongSpotlight from './SongSpotlight';
 import TrackArt from './TrackArt';
 import TrackCard from './TrackCard';
 
@@ -70,7 +72,17 @@ export default function PlaylistSection() {
     (error) => notify({ tone: 'error', title: 'Gagal memutar lagu', body: error.message }),
     [notify],
   );
-  const { isPlaying, toggle } = usePlaylistPlayer({ onError });
+  const { isPlaying, toggle: toggleTrack, pause: pauseTrack } = usePlaylistPlayer({ onError });
+  // One sound at a time: the YouTube player and the original tracks pause each other.
+  const onVideoError = useCallback(
+    (error) => notify({ tone: 'error', title: 'Gagal memutar video', body: error.message }),
+    [notify],
+  );
+  const youtube = useYouTubePlayer({ onPlay: pauseTrack, onError: onVideoError });
+  const toggle = (track) => {
+    if (!isPlaying(track.id)) youtube.pause();
+    toggleTrack(track);
+  };
   const { isFavorite, toggleFavorite } = useFavoriteTracks();
   const [infoId, setInfoId] = useState(null);
   const info = TRACKS.find(({ id }) => id === infoId) ?? null;
@@ -79,10 +91,17 @@ export default function PlaylistSection() {
     <section id="playlist" aria-labelledby="playlist-title" className="page-shell scroll-mt-28 py-20 lg:py-24">
       <SectionHeading
         title={<span id="playlist-title">Playlist ngoding</span>}
-        body="Musik original untuk menemani kamu ngoding. Semuanya diputar langsung di browser, tanpa iklan dan tanpa unduhan."
+        body="Mulai dari lagu utama pilihan kami, cari lagu favoritmu dari YouTube, atau pakai musik original yang diputar langsung di browser."
       />
 
-      <Reveal as="ul" className="mt-10 grid gap-3 md:grid-cols-2">
+      <SongSpotlight player={youtube} />
+
+      <div className="mt-12 max-w-2xl">
+        <h3 className="font-display text-xl font-bold text-ink">Musik original</h3>
+        <p className="mt-1 text-sm text-ink-muted">Disintesis langsung di browser kamu, tanpa iklan dan tanpa unduhan.</p>
+      </div>
+
+      <Reveal as="ul" className="mt-5 grid gap-3 md:grid-cols-2">
         {TRACKS.map((track) => (
           <li key={track.id} className="min-w-0">
             <TrackCard

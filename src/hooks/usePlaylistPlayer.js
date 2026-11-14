@@ -75,7 +75,7 @@ export function usePlaylistPlayer({ onError } = {}) {
   // Leaving the page stops the music.
   useEffect(() => halt, [halt]);
 
-  return { currentId, playing, toggle, isPlaying: (id) => playing && currentId === id };
+  return { currentId, playing, toggle, pause, isPlaying: (id) => playing && currentId === id };
 }
 
 const FAVORITES_KEY = 'jokiwebapp:favorite-tracks';
