@@ -2,6 +2,7 @@ import { ArrowRight, MessagesSquare } from 'lucide-react';
 import { HERO_STACK } from '../../content/techStack';
 import CodeWindow from './CodeWindow';
 import ScrambleText from './ScrambleText';
+import TechLogos from './TechLogos';
 
 export default function Hero({ onConsult }) {
   return (
@@ -37,26 +38,7 @@ export default function Hero({ onConsult }) {
             </a>
           </div>
 
-          <ul aria-label="Stack yang dikerjakan" className="mt-9 flex flex-wrap gap-2">
-            {HERO_STACK.map(({ name, url, color, path }) => (
-              <li key={name}>
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={`Situs resmi ${name}`}
-                  style={{ '--brand': color }}
-                  className="stack-chip"
-                >
-                  <svg aria-hidden viewBox="0 0 24 24" className="size-4 shrink-0" fill="currentColor">
-                    <path d={path} />
-                  </svg>
-                  {name}
-                  <span className="sr-only"> (situs resmi, tab baru)</span>
-                </a>
-              </li>
-            ))}
-          </ul>
+          <TechLogos names={HERO_STACK} size="lg" label="Stack yang dikerjakan" className="mt-9" />
         </div>
 
         <div style={{ animationDelay: '120ms' }} className="animate__animated animate__fadeInUp animate__faster min-w-0">

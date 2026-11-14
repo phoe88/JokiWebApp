@@ -8,21 +8,10 @@ import ProjectMockup from './ProjectMockup';
 import Reveal from './Reveal';
 import ScrambleText from './ScrambleText';
 import SectionHeading from './SectionHeading';
+import TechLogos from './TechLogos';
 
 function SampleTag() {
   return <span className="demo-tag">Contoh</span>;
-}
-
-function TechTags({ stack }) {
-  return (
-    <ul aria-label="Teknologi" className="flex flex-wrap gap-1.5">
-      {stack.map((name) => (
-        <li key={name} className="tech-tag">
-          {name}
-        </li>
-      ))}
-    </ul>
-  );
 }
 
 function ProjectCard({ project, onDetails, index }) {
@@ -39,7 +28,7 @@ function ProjectCard({ project, onDetails, index }) {
         </div>
         <h3 className="mt-1.5 font-display text-lg font-bold tracking-tight text-ink">{project.title}</h3>
         <p className="mb-4 mt-1.5 flex-1 text-sm leading-relaxed text-ink-muted">{project.summary}</p>
-        <TechTags stack={project.stack} />
+        <TechLogos names={project.stack} />
         <div className="mt-4 flex gap-2">
           <button type="button" onClick={() => onDetails(project)} className="btn btn-ghost flex-1 px-3 py-2 text-[13px]">
             <Info aria-hidden className="size-3.5" />
@@ -77,7 +66,7 @@ function ProjectDetails({ project, onClose }) {
             ))}
           </ul>
           <div className="mt-4">
-            <TechTags stack={project.stack} />
+            <TechLogos names={project.stack} />
           </div>
           {project.sample && (
             <p className="glass-inset mt-4 p-3 text-sm text-ink-muted">
