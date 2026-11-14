@@ -1,8 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Heart, Music, Pause, Play } from 'lucide-react';
 import { TRACKS } from '../../content/playlist';
 import { useToast } from '../../context/ToastContext';
 import { useFavoriteTracks, usePlaylistPlayer } from '../../hooks/usePlaylistPlayer';
+import { usePreviewPlayer } from '../../hooks/usePreviewPlayer';
 import { useYouTubePlayer } from '../../hooks/useYouTubePlayer';
 import Modal from '../Modal';
 import Reveal from './Reveal';
@@ -73,14 +74,30 @@ export default function PlaylistSection() {
     [notify],
   );
   const { isPlaying, toggle: toggleTrack, pause: pauseTrack } = usePlaylistPlayer({ onError });
-  // One sound at a time: the YouTube player and the original tracks pause each other.
   const onVideoError = useCallback(
     (error) => notify({ tone: 'error', title: 'Gagal memutar video', body: error.message }),
     [notify],
   );
-  const youtube = useYouTubePlayer({ onPlay: pauseTrack, onError: onVideoError });
+
+  // One sound at a time: the featured video, the search previews and the original tracks pause each other.
+  const pauseOthersRef = useRef({});
+  const youtube = useYouTubePlayer({ onPlay: () => pauseOthersRef.current.youtube(), onError: onVideoError });
+  const preview = usePreviewPlayer({ onPlay: () => pauseOthersRef.current.preview(), onError });
+  pauseOthersRef.current = {
+    youtube: () => {
+      pauseTrack();
+      preview.pause();
+    },
+    preview: () => {
+      pauseTrack();
+      youtube.pause();
+    },
+  };
   const toggle = (track) => {
-    if (!isPlaying(track.id)) youtube.pause();
+    if (!isPlaying(track.id)) {
+      youtube.pause();
+      preview.pause();
+    }
     toggleTrack(track);
   };
   const { isFavorite, toggleFavorite } = useFavoriteTracks();
@@ -91,10 +108,10 @@ export default function PlaylistSection() {
     <section id="playlist" aria-labelledby="playlist-title" className="page-shell scroll-mt-28 py-20 lg:py-24">
       <SectionHeading
         title={<span id="playlist-title">Playlist ngoding</span>}
-        body="Mulai dari lagu utama pilihan kami, cari lagu favoritmu dari YouTube, atau pakai musik original yang diputar langsung di browser."
+        body="Mulai dari lagu utama pilihan kami, dengarkan pratinjau lagu favoritmu, atau pakai musik original yang diputar langsung di browser."
       />
 
-      <SongSpotlight player={youtube} />
+      <SongSpotlight player={youtube} preview={preview} />
 
       <div className="mt-12 max-w-2xl">
         <h3 className="font-display text-xl font-bold text-ink">Musik original</h3>

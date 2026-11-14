@@ -1,12 +1,9 @@
-import { useRef, useState } from 'react';
-import { LoaderCircle, Play, Search, SearchX, TriangleAlert, Undo2, X } from 'lucide-react';
+import { useState } from 'react';
+import { ExternalLink, LoaderCircle, Pause, Play, Search, SearchX, TriangleAlert, X } from 'lucide-react';
 import { FEATURED_SONG } from '../../content/playlist';
-import { useYouTubeSearch } from '../../hooks/useYouTubeSearch';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+import { useSongSearch } from '../../hooks/useSongSearch';
 
-const SUGGESTIONS = ['Tulus', 'Hindia', 'Nadin Amizah', 'Lo-fi Indonesia'];
-
-const thumbnailOf = (videoId) => `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+const SUGGESTIONS = ['Tulus', 'Hindia', 'Nadin Amizah', 'Lo-fi'];
 
 function Equalizer() {
   return (
@@ -18,11 +15,11 @@ function Equalizer() {
   );
 }
 
-/** The video area. Until someone presses play it is only a thumbnail, so YouTube loads nothing. */
-function SongPlayer({ player, featured, onBackToFeatured }) {
-  const { containerRef, video, status, started, play } = player;
-  const current = video ?? featured;
-  const isFeatured = current.videoId === featured.videoId;
+const STATUS_TEXT = { idle: 'Lagu utama', loading: 'Memuat…', playing: 'Sedang diputar', paused: 'Dijeda' };
+
+/** The featured song's video. Until someone presses play it is only a thumbnail, so YouTube loads nothing. */
+function SongPlayer({ player, song }) {
+  const { containerRef, status, started, play } = player;
 
   return (
     <div className="glass overflow-hidden p-3 sm:p-4">
@@ -32,12 +29,12 @@ function SongPlayer({ player, featured, onBackToFeatured }) {
         {!started && (
           <button
             type="button"
-            onClick={() => play(featured)}
-            aria-label={`Putar ${featured.title} oleh ${featured.channel}`}
+            onClick={() => play(song)}
+            aria-label={`Putar ${song.title} oleh ${song.channel}`}
             className="song-facade group absolute inset-0"
           >
             <img
-              src={thumbnailOf(featured.videoId)}
+              src={`https://i.ytimg.com/vi/${song.videoId}/hqdefault.jpg`}
               alt=""
               width="480"
               height="360"
@@ -47,39 +44,31 @@ function SongPlayer({ player, featured, onBackToFeatured }) {
             />
             <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/10" />
             <span className="song-play-btn absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <Play aria-hidden className="size-7 translate-x-0.5" fill="currentColor" />
+              <Play aria-hidden className="size-6 translate-x-0.5 sm:size-7" fill="currentColor" />
             </span>
             <span className="absolute inset-x-0 bottom-0 p-4 text-left sm:p-5">
               <span className="badge-featured">Lagu utama</span>
               <span className="mt-2 block font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">
-                {featured.title}
+                {song.title}
               </span>
               <span className="block text-sm text-white/75">
-                {featured.channel} · {featured.label}
+                {song.channel} · {song.label}
               </span>
             </span>
           </button>
         )}
       </div>
 
-      <div className="mt-3 flex min-h-11 flex-wrap items-center justify-between gap-x-4 gap-y-2 px-1">
-        <div className="min-w-0 flex-1" aria-live="polite">
-          <p className="flex items-center gap-2 text-xs font-medium text-ink-dim">
-            {status === 'playing' && <Equalizer />}
-            {status === 'loading' && <LoaderCircle aria-hidden className="size-3.5 animate-spin" />}
-            {!started ? 'Lagu utama' : status === 'playing' ? 'Sedang diputar' : status === 'loading' ? 'Memuat…' : 'Dijeda'}
-          </p>
-          <p className="truncate text-[15px] font-semibold text-ink">
-            {current.title}
-            <span className="font-normal text-ink-muted"> · {current.channel}</span>
-          </p>
-        </div>
-        {started && !isFeatured && (
-          <button type="button" onClick={onBackToFeatured} className="btn btn-ghost shrink-0 px-3.5 py-2 text-[13px]">
-            <Undo2 aria-hidden className="size-4" />
-            Kembali ke {featured.title}
-          </button>
-        )}
+      <div className="mt-3 px-1" aria-live="polite">
+        <p className="flex items-center gap-2 text-xs font-medium text-ink-dim">
+          {status === 'playing' && <Equalizer />}
+          {status === 'loading' && <LoaderCircle aria-hidden className="size-3.5 animate-spin" />}
+          {STATUS_TEXT[status]}
+        </p>
+        <p className="truncate text-[15px] font-semibold text-ink">
+          {song.title}
+          <span className="font-normal text-ink-muted"> · {song.channel}</span>
+        </p>
       </div>
     </div>
   );
@@ -90,9 +79,9 @@ function ResultSkeleton() {
     <ul aria-hidden className="space-y-1.5">
       {[0, 1, 2, 3].map((row) => (
         <li key={row} className="flex items-center gap-3 p-1.5">
-          <span className="aspect-video w-28 shrink-0 animate-pulse rounded-lg bg-white/[0.06]" />
+          <span className="size-14 shrink-0 animate-pulse rounded-lg bg-white/[0.06]" />
           <span className="flex-1 space-y-2">
-            <span className="block h-3 w-4/5 animate-pulse rounded bg-white/[0.06]" />
+            <span className="block h-3 w-3/4 animate-pulse rounded bg-white/[0.06]" />
             <span className="block h-3 w-1/2 animate-pulse rounded bg-white/[0.04]" />
           </span>
         </li>
@@ -101,9 +90,64 @@ function ResultSkeleton() {
   );
 }
 
-/** Song search. It searches on submit only, because every search spends YouTube API quota. */
-function SongSearch({ currentId, playingNow, onPick }) {
-  const { status, query, items, error, search } = useYouTubeSearch();
+/** One search result: the artwork and names play the preview, the link opens Apple Music. */
+function SongResult({ song, preview }) {
+  const active = preview.isActive(song.id);
+  const playing = active && preview.status === 'playing';
+  const loading = active && preview.status === 'loading';
+  const Icon = loading ? LoaderCircle : playing ? Pause : Play;
+
+  return (
+    <li className="song-result" data-active={active}>
+      <button
+        type="button"
+        onClick={() => preview.toggle(song)}
+        aria-label={`${playing || loading ? 'Jeda' : 'Putar'} pratinjau ${song.title} oleh ${song.artist}`}
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-lg p-1.5 text-left"
+      >
+        <span className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-white/[0.06]">
+          {song.artwork && (
+            <img src={song.artwork} alt="" width="200" height="200" loading="lazy" decoding="async" className="size-full object-cover" />
+          )}
+          <span className="song-result-overlay absolute inset-0 grid place-items-center bg-black/50 text-white">
+            <Icon aria-hidden className={`size-5 ${loading ? 'animate-spin' : ''}`} fill={loading ? 'none' : 'currentColor'} />
+          </span>
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-2">
+            {playing && <Equalizer />}
+            <span className="truncate text-sm font-medium text-ink">{song.title}</span>
+          </span>
+          <span className="mt-0.5 block truncate text-xs text-ink-dim">
+            {song.artist}
+            {song.album ? ` · ${song.album}` : ''}
+          </span>
+          {active && (
+            <span aria-hidden className="mt-1.5 block h-1 overflow-hidden rounded-full bg-white/10">
+              <span className="block h-full rounded-full bg-live" style={{ width: `${preview.progress * 100}%` }} />
+            </span>
+          )}
+        </span>
+      </button>
+      {song.storeUrl && (
+        <a
+          href={song.storeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Dengarkan ${song.title} di Apple Music (tab baru)`}
+          className="song-store"
+        >
+          <span className="hidden sm:inline">Apple Music</span>
+          <ExternalLink aria-hidden className="size-3.5" />
+        </a>
+      )}
+    </li>
+  );
+}
+
+/** Song search on iTunes, with each result's 30-second preview playable in place. */
+function SongSearch({ preview }) {
+  const { status, query, items, error, search } = useSongSearch();
   const [text, setText] = useState('');
 
   const submit = (value) => {
@@ -114,7 +158,7 @@ function SongSearch({ currentId, playingNow, onPick }) {
   return (
     <div className="glass flex min-w-0 flex-col p-4 sm:p-5">
       <h3 className="font-display text-lg font-bold text-ink">Cari lagu lain</h3>
-      <p className="mt-1 text-sm text-ink-muted">Cari dari YouTube, lalu putar langsung di player.</p>
+      <p className="mt-1 text-sm text-ink-muted">Cari dari iTunes dan dengarkan pratinjau 30 detiknya.</p>
 
       <form
         role="search"
@@ -196,67 +240,28 @@ function SongSearch({ currentId, playingNow, onPick }) {
 
         {status === 'done' && items.length > 0 && (
           <ul className="song-results -mx-1.5 max-h-[22rem] space-y-0.5 overflow-y-auto pr-1">
-            {items.map((item) => {
-              const active = item.videoId === currentId;
-              return (
-                <li key={item.videoId}>
-                  <button
-                    type="button"
-                    onClick={() => onPick(item)}
-                    aria-current={active || undefined}
-                    className="song-result"
-                  >
-                    <span className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-lg bg-white/[0.06]">
-                      <img
-                        src={item.thumbnail}
-                        alt=""
-                        width="320"
-                        height="180"
-                        loading="lazy"
-                        decoding="async"
-                        className="size-full object-cover"
-                      />
-                      {active && playingNow && (
-                        <span className="absolute inset-0 grid place-items-center bg-black/55">
-                          <Equalizer />
-                        </span>
-                      )}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="line-clamp-2 text-sm font-medium leading-snug text-ink">{item.title}</span>
-                      <span className="mt-0.5 block truncate text-xs text-ink-dim">{item.channel}</span>
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
+            {items.map((song) => (
+              <SongResult key={song.id} song={song} preview={preview} />
+            ))}
           </ul>
         )}
       </div>
+
+      {status !== 'idle' && (
+        <p className="mt-3 border-t border-white/[0.06] pt-3 text-xs leading-relaxed text-ink-dim">
+          Pratinjau 30 detik disediakan oleh iTunes. Lagu lengkapnya ada di Apple Music.
+        </p>
+      )}
     </div>
   );
 }
 
-/** The featured YouTube song and a search for other songs, sharing one player. */
-export default function SongSpotlight({ player }) {
-  const playerRef = useRef(null);
-  const reducedMotion = usePrefersReducedMotion();
-  const currentId = (player.video ?? FEATURED_SONG).videoId;
-
-  const pick = (item) => {
-    player.play(item);
-    // On narrow screens the player is above the results, so bring it into view.
-    if (window.matchMedia('(max-width: 1023px)').matches) {
-      playerRef.current?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
-    }
-  };
-
+/** The featured YouTube song beside a song search with iTunes previews. */
+export default function SongSpotlight({ player, preview }) {
   return (
     <div className="mt-10 grid items-start gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-      <div ref={playerRef} className="scroll-mt-28">
-        <SongPlayer player={player} featured={FEATURED_SONG} onBackToFeatured={() => player.play(FEATURED_SONG)} />
-      </div>
-      <SongSearch currentId={currentId} playingNow={player.status === 'playing'} onPick={pick} />
+      <SongPlayer player={player} song={FEATURED_SONG} />
+      <SongSearch preview={preview} />
     </div>
   );
 }
