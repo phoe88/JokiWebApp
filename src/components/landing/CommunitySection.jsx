@@ -29,6 +29,37 @@ function ChannelList() {
   );
 }
 
+function TopicPicker() {
+  const [selected, setSelected] = useState(COMMUNITY_TOPICS[0].id);
+  const current = COMMUNITY_TOPICS.find(({ id }) => id === selected);
+
+  return (
+    <div className="glass-inset min-w-0 p-5">
+      <p id="topic-label" className="font-mono text-xs text-ink-dim">
+        topik diskusi
+      </p>
+      <ul role="group" aria-labelledby="topic-label" className="mt-3 flex flex-col gap-1">
+        {COMMUNITY_TOPICS.map(({ id }) => (
+          <li key={id}>
+            <button
+              type="button"
+              aria-pressed={selected === id}
+              onClick={() => setSelected(id)}
+              className="topic-option"
+            >
+              <Hash aria-hidden className="size-3.5 text-live" />
+              {id}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p aria-live="polite" className="mt-3 border-t border-white/10 px-1 pt-3 text-sm leading-relaxed text-ink-muted">
+        {current.note}
+      </p>
+    </div>
+  );
+}
+
 export default function CommunitySection() {
   const [open, setOpen] = useState(false);
 
@@ -43,10 +74,9 @@ export default function CommunitySection() {
 
         <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center">
           <div className="min-w-0">
-            <p className="code-tag">{'// komunitas'}</p>
             <h2
               id="komunitas-title"
-              className="mt-3 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl"
+              className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl"
             >
               Belajar dan berkembang bareng
             </h2>
@@ -74,22 +104,7 @@ export default function CommunitySection() {
             </button>
           </div>
 
-          <div aria-hidden className="glass-inset min-w-0 p-5">
-            <p className="font-mono text-xs text-ink-dim">topik diskusi</p>
-            <ul className="mt-3 flex flex-col gap-1">
-              {COMMUNITY_TOPICS.map((topic, index) => (
-                <li
-                  key={topic}
-                  className={`flex items-center gap-2 rounded-lg px-3 py-2.5 font-mono text-sm ${
-                    index === 0 ? 'bg-live/10 text-ink' : 'text-ink-muted'
-                  }`}
-                >
-                  <Hash className="size-3.5 text-live" />
-                  {topic}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <TopicPicker />
         </div>
       </Reveal>
 

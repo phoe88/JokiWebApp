@@ -1,16 +1,10 @@
-import { Link } from 'react-router-dom';
 import { APP_NAME } from '../../config/brand';
 import { COMMUNITY_CHANNELS, SOCIAL_LINKS } from '../../config/site';
 import { NAV_SECTIONS } from '../../content/landing';
+import { useAuth } from '../../context/AuthContext';
+import TemplateLink from '../TemplateLink';
 import Logo from '../shell/Logo';
-
-const APP_LINKS = [
-  { to: '/services', label: 'Katalog' },
-  { to: '/pricing', label: 'Harga' },
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/live-feed', label: 'Live Feed' },
-  { to: '/terminal', label: 'Terminal' },
-];
+import SectionLink from './SectionLink';
 
 const linkClass = 'rounded text-sm text-ink-muted hover:text-ink';
 
@@ -24,6 +18,7 @@ function FooterColumn({ title, children }) {
 }
 
 export default function SiteFooter() {
+  const { user, loading, openLogin } = useAuth();
   const handles = [...COMMUNITY_CHANNELS, ...SOCIAL_LINKS].filter(({ url }) => url);
 
   return (
@@ -40,21 +35,24 @@ export default function SiteFooter() {
         <FooterColumn title="Navigasi">
           {NAV_SECTIONS.map(({ id, label }) => (
             <li key={id}>
-              <a href={`#${id}`} className={linkClass}>
+              <SectionLink id={id} className={linkClass}>
                 {label}
-              </a>
+              </SectionLink>
             </li>
           ))}
         </FooterColumn>
 
-        <FooterColumn title="Aplikasi">
-          {APP_LINKS.map(({ to, label }) => (
-            <li key={to}>
-              <Link to={to} className={linkClass}>
-                {label}
-              </Link>
+        <FooterColumn title="Template">
+          <li>
+            <TemplateLink className={linkClass}>Cari Template</TemplateLink>
+          </li>
+          {!loading && !user && (
+            <li>
+              <button type="button" onClick={() => openLogin()} className={linkClass}>
+                Masuk atau Daftar
+              </button>
             </li>
-          ))}
+          )}
         </FooterColumn>
 
         <FooterColumn title="Komunitas">

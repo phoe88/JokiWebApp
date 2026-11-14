@@ -54,7 +54,7 @@ export function AuthProvider({ children }) {
     if (error) throw error;
     // With confirmations on, Supabase hides duplicates by returning a user with no identities.
     if (data.user && data.user.identities?.length === 0) {
-      throw new Error('An account with this email already exists. Sign in instead.');
+      throw new Error('Email ini sudah terdaftar. Silakan masuk.');
     }
     return !data.session;
   }, []);
@@ -64,8 +64,11 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   }, []);
 
-  /** Opens the login modal. `reason` is an optional line shown at the top of it. */
-  const openLogin = useCallback((reason = null) => setLoginRequest({ reason }), []);
+  /**
+   * Opens the login modal. `reason` is an optional line shown at the top of it, and
+   * `next` is a path to go to once sign in succeeds.
+   */
+  const openLogin = useCallback((reason = null, next = null) => setLoginRequest({ reason, next }), []);
   const closeLogin = useCallback(() => setLoginRequest(null), []);
 
   const value = useMemo(

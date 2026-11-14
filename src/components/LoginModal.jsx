@@ -1,29 +1,41 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { KeyRound, LoaderCircle, MailCheck, ServerOff, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { isDemoMode } from '../lib/SupabaseClient';
 
 const MODES = [
-  { id: 'signin', label: 'Sign In' },
-  { id: 'signup', label: 'Sign Up' },
+  { id: 'signin', label: 'Masuk' },
+  { id: 'signup', label: 'Daftar' },
 ];
+
+/** Supabase answers in English. These are the messages people actually hit. */
+const AUTH_ERRORS = [
+  [/invalid login credentials/i, 'Email atau password salah.'],
+  [/email not confirmed/i, 'Email belum dikonfirmasi. Buka link yang dikirim ke email kamu dulu.'],
+  [/already registered|already exists/i, 'Email ini sudah terdaftar. Silakan masuk.'],
+  [/password should be at least/i, 'Password minimal 6 karakter.'],
+  [/rate limit|too many requests|security purposes/i, 'Terlalu banyak percobaan. Tunggu sebentar lalu coba lagi.'],
+  [/unable to validate email|invalid email/i, 'Format email tidak valid.'],
+  [/failed to fetch|network/i, 'Tidak bisa terhubung ke server. Periksa koneksi kamu.'],
+];
+
+function translateError(message = '') {
+  return AUTH_ERRORS.find(([pattern]) => pattern.test(message))?.[1] ?? message;
+}
 
 function DemoExplanation() {
   return (
     <div>
       <p className="flex items-center gap-2 text-sm font-semibold text-cyber-soft">
         <ServerOff aria-hidden className="size-4" />
-        Supabase is not configured
+        Login belum tersedia
       </p>
       <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-        This build is running in demo mode, so there is no account system to sign in to. To enable
-        login, add these two values to a <code className="font-semibold text-ink">.env</code> file and
-        restart the app:
+        Sistem akun belum terhubung di versi ini, jadi belum ada yang bisa dimasuki. Coba lagi nanti,
+        atau hubungi kami lewat konsultasi.
       </p>
-      <pre className="glass-inset mt-3 overflow-x-auto p-3 text-xs leading-relaxed text-live">
-        VITE_SUPABASE_URL{'\n'}VITE_SUPABASE_ANON_KEY
-      </pre>
     </div>
   );
 }
@@ -58,14 +70,10 @@ function AuthForm({ reason, onDone }) {
           return;
         }
       }
-      notify({
-        tone: 'success',
-        title: 'Session active',
-        body: reason ? 'You are signed in. Select the service again to place the order.' : undefined,
-      });
+      notify({ tone: 'success', title: 'Berhasil masuk' });
       onDone();
     } catch (authError) {
-      setError(authError.message);
+      setError(translateError(authError.message));
     } finally {
       setSubmitting(false);
     }
@@ -76,11 +84,11 @@ function AuthForm({ reason, onDone }) {
       <div>
         <p className="flex items-center gap-2 text-sm font-semibold text-live">
           <MailCheck aria-hidden className="size-4" />
-          Confirmation sent
+          Cek email kamu
         </p>
         <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-          Open the link sent to <span className="text-ink">{form.email}</span> to activate your
-          account, then sign in here.
+          Buka link yang dikirim ke <span className="text-ink">{form.email}</span> untuk mengaktifkan
+          akun, lalu masuk di sini.
         </p>
       </div>
     );
@@ -90,7 +98,7 @@ function AuthForm({ reason, onDone }) {
     <>
       {reason && <p className="mb-4 text-sm text-cyber-soft">{reason}</p>}
 
-      <div role="group" aria-label="Choose sign in or sign up" className="segment grid w-full grid-cols-2">
+      <div role="group" aria-label="Pilih masuk atau daftar" className="segment grid w-full grid-cols-2">
         {MODES.map(({ id, label }) => (
           <button
             key={id}
@@ -110,7 +118,7 @@ function AuthForm({ reason, onDone }) {
       <form onSubmit={submit} className="mt-4 flex flex-col gap-3">
         {mode === 'signup' && (
           <label className="block">
-            <span className="text-[13px] font-medium text-ink-muted">Username (optional)</span>
+            <span className="text-[13px] font-medium text-ink-muted">Username (opsional)</span>
             <input
               value={form.username}
               onChange={update('username')}
@@ -152,7 +160,7 @@ function AuthForm({ reason, onDone }) {
 
         <button type="submit" disabled={submitting} className="btn btn-primary mt-1 w-full">
           {submitting && <LoaderCircle aria-hidden className="size-4 animate-spin" />}
-          {mode === 'signin' ? 'Secure Login' : 'Create Account'}
+          {mode === 'signin' ? 'Masuk' : 'Buat Akun'}
         </button>
       </form>
     </>
@@ -161,6 +169,7 @@ function AuthForm({ reason, onDone }) {
 
 export default function LoginModal() {
   const { loginRequest, closeLogin } = useAuth();
+  const navigate = useNavigate();
   const dialogRef = useRef(null);
   const open = Boolean(loginRequest);
 
@@ -173,6 +182,12 @@ export default function LoginModal() {
     }
     if (!open && dialog.open) dialog.close();
   }, [open]);
+
+  const finish = () => {
+    const next = loginRequest?.next;
+    closeLogin();
+    if (next) navigate(next);
+  };
 
   return (
     <dialog
@@ -191,13 +206,13 @@ export default function LoginModal() {
               <span className="icon-chip icon-chip--cyber">
                 <KeyRound aria-hidden className="size-4" />
               </span>
-              Secure Login
+              Masuk ke JokiWebApp
             </h2>
-            <button type="button" onClick={closeLogin} aria-label="Close" className="icon-btn">
+            <button type="button" onClick={closeLogin} aria-label="Tutup" className="icon-btn">
               <X aria-hidden className="size-4" />
             </button>
           </div>
-          {isDemoMode ? <DemoExplanation /> : <AuthForm reason={loginRequest.reason} onDone={closeLogin} />}
+          {isDemoMode ? <DemoExplanation /> : <AuthForm reason={loginRequest.reason} onDone={finish} />}
         </div>
       )}
     </dialog>

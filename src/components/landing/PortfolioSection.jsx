@@ -108,9 +108,8 @@ export default function PortfolioSection() {
   return (
     <section id="portofolio" aria-labelledby="portofolio-title" className="page-shell scroll-mt-28 py-20 lg:py-24">
       <SectionHeading
-        tag="portofolio"
         title={<span id="portofolio-title">Hasil kerja yang bisa kamu lihat</span>}
-        body="Dashboard dan katalog di bawah berjalan di situs ini, jadi kamu bisa langsung mencobanya."
+        body="Beberapa project yang sudah dikerjakan, dari dashboard sampai landing page."
       />
 
       <Reveal

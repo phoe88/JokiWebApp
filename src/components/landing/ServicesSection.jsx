@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
 import { ArrowRight, Check } from 'lucide-react';
 import { SERVICES } from '../../content/landing';
+import TemplateLink from '../TemplateLink';
 import GlowCard from './GlowCard';
 import Reveal from './Reveal';
 import ScrambleText from './ScrambleText';
@@ -11,15 +11,14 @@ export default function ServicesSection() {
     <section id="layanan" aria-labelledby="layanan-title" className="page-shell scroll-mt-28 py-20 lg:py-24">
       <div className="flex flex-wrap items-end justify-between gap-6">
         <SectionHeading
-          tag="layanan"
           title={<span id="layanan-title">Apa yang bisa dikerjakan</span>}
           body="Dari web baru sampai perbaikan project yang macet, pilih bantuan yang kamu butuhkan."
         />
         <Reveal>
-          <Link to="/services" className="btn btn-ghost glitch-host">
-            <ScrambleText text="Lihat Katalog" />
+          <TemplateLink className="btn btn-ghost glitch-host">
+            <ScrambleText text="Lihat Template" />
             <ArrowRight aria-hidden className="size-4" />
-          </Link>
+          </TemplateLink>
         </Reveal>
       </div>
 

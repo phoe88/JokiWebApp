@@ -1,20 +1,21 @@
 import { Link } from 'react-router-dom';
 import { Unplug } from 'lucide-react';
 import Notice from '../components/Notice';
+import SitePage from '../components/shell/SitePage';
 
 export default function NotFound() {
   return (
-    <div className="pt-6">
+    <SitePage>
       <Notice
         icon={Unplug}
-        title="404: Route not found"
-        body="This address does not lead anywhere."
+        title="404: Halaman tidak ditemukan"
+        body="Alamat ini tidak mengarah ke halaman mana pun."
         action={
           <Link to="/" className="btn btn-primary mt-6">
-            Return Home
+            Kembali ke Beranda
           </Link>
         }
       />
-    </div>
+    </SitePage>
   );
 }

@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { CheckCheck, Code2, LayoutDashboard, LoaderCircle } from 'lucide-react';
+import { CheckCheck, Code2, CodeXml, LoaderCircle } from 'lucide-react';
+import { APP_NAME } from '../../config/brand';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
-import ProjectMockup from './ProjectMockup';
 
 const TYPE_MS = 34;
-const HOLD_TICKS = 130;
+const ticks = (ms) => Math.round(ms / TYPE_MS);
+
+/** After the code is typed: a pause, the logo glitching in and holding, then a quick glitch out. */
+const PAUSE_TICKS = ticks(2000);
+const LOGO_TICKS = ticks(2000 + 3200);
+const LOGO_OUT_TICKS = ticks(450);
 
 const TONE = {
   kw: 'text-cyber',
@@ -64,6 +69,50 @@ function CodeLines({ typed, showCaret }) {
   });
 }
 
+const CYCLE = TOTAL + PAUSE_TICKS + LOGO_TICKS + LOGO_OUT_TICKS;
+
+function phaseAt(tick) {
+  if (tick < TOTAL) return 'typing';
+  if (tick < TOTAL + PAUSE_TICKS) return 'done';
+  if (tick < TOTAL + PAUSE_TICKS + LOGO_TICKS) return 'logo';
+  return 'logo-out';
+}
+
+function LogoMark() {
+  return (
+    <>
+      <span className="glitch-logo__chip">
+        <CodeXml className="size-12 sm:size-14" strokeWidth={2.25} />
+      </span>
+      <span className="glitch-logo__word">
+        {APP_NAME}
+        <span className="glitch-logo__dot" />
+      </span>
+    </>
+  );
+}
+
+/**
+ * The JokiWebApp logo in green, assembled from glitching slices. The main layer
+ * reveals band by band while two offset ghost copies flicker and fade.
+ */
+function GlitchLogo({ leaving }) {
+  return (
+    <div aria-hidden className={`glitch-logo ${leaving ? 'glitch-logo--out' : ''}`}>
+      <div className="glitch-logo__layer glitch-logo__layer--ghost-a">
+        <LogoMark />
+      </div>
+      <div className="glitch-logo__layer glitch-logo__layer--ghost-b">
+        <LogoMark />
+      </div>
+      <div className="glitch-logo__layer glitch-logo__layer--main">
+        <LogoMark />
+      </div>
+      <span className="glitch-logo__scan" />
+    </div>
+  );
+}
+
 function CodePanel() {
   const reducedMotion = usePrefersReducedMotion();
   const [typed, setTyped] = useState(0);
@@ -80,7 +129,7 @@ function CodePanel() {
 
     const interval = window.setInterval(() => {
       if (!visible || document.hidden) return;
-      setTyped((current) => (current >= TOTAL + HOLD_TICKS ? 0 : current + 1));
+      setTyped((current) => (current >= CYCLE ? 0 : current + 1));
     }, TYPE_MS);
 
     return () => {
@@ -91,12 +140,22 @@ function CodePanel() {
 
   const shown = reducedMotion ? TOTAL : typed;
   const done = shown >= TOTAL;
+  const phase = reducedMotion ? 'done' : phaseAt(shown);
+  const logoShown = phase === 'logo' || phase === 'logo-out';
 
   return (
     <div ref={panelRef}>
       <p className="sr-only">Contoh potongan kode yang membuat, menguji, dan men-deploy sebuah project.</p>
-      <div aria-hidden className="no-scrollbar overflow-x-auto p-4 font-mono text-[11.5px] leading-[1.7] sm:p-5 sm:text-[13px]">
-        <CodeLines typed={shown} showCaret={!done} />
+      <div className="relative">
+        <div
+          aria-hidden
+          className={`no-scrollbar overflow-x-auto p-4 font-mono text-[11.5px] leading-[1.7] sm:p-5 sm:text-[13px] ${
+            logoShown ? 'code-glitch-out' : ''
+          }`}
+        >
+          <CodeLines typed={shown} showCaret={!done} />
+        </div>
+        {logoShown && <GlitchLogo leaving={phase === 'logo-out'} />}
       </div>
       <p aria-hidden className="flex items-center gap-2 border-t border-white/10 px-4 py-2.5 font-mono text-xs text-ink-muted sm:px-5">
         {done ? (
@@ -115,24 +174,8 @@ function CodePanel() {
   );
 }
 
-const TABS = [
-  { id: 'code', label: 'project.js', icon: Code2 },
-  { id: 'preview', label: 'preview', icon: LayoutDashboard },
-];
-
-/** The hero visual: typed code in one tab and a finished screen in the other. */
+/** The hero visual: code that types itself out, then reports the build as done. */
 export default function CodeWindow() {
-  const [tab, setTab] = useState('code');
-  const tabRefs = useRef({});
-
-  const onKeyDown = (event) => {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-    event.preventDefault();
-    const next = tab === 'code' ? 'preview' : 'code';
-    setTab(next);
-    tabRefs.current[next]?.focus();
-  };
-
   return (
     <div className="neon-frame">
       <div className="neon-frame__ring">
@@ -143,42 +186,12 @@ export default function CodeWindow() {
               <span className="size-2.5 rounded-full bg-cyber/70" />
               <span className="size-2.5 rounded-full bg-live" />
             </span>
-            <div role="tablist" aria-label="Tampilan hero" className="flex gap-1">
-              {TABS.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  ref={(node) => {
-                    tabRefs.current[id] = node;
-                  }}
-                  type="button"
-                  role="tab"
-                  id={`hero-tab-${id}`}
-                  aria-selected={tab === id}
-                  aria-controls="hero-tabpanel"
-                  tabIndex={tab === id ? 0 : -1}
-                  onClick={() => setTab(id)}
-                  onKeyDown={onKeyDown}
-                  className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-mono text-xs ${
-                    tab === id ? 'bg-white/10 text-ink' : 'text-ink-dim hover:text-ink'
-                  }`}
-                >
-                  <Icon aria-hidden className="size-3.5" />
-                  {label}
-                </button>
-              ))}
-            </div>
+            <p className="flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1 font-mono text-xs text-ink">
+              <Code2 aria-hidden className="size-3.5" />
+              project.js
+            </p>
           </div>
-
-          <div id="hero-tabpanel" role="tabpanel" aria-labelledby={`hero-tab-${tab}`}>
-            {tab === 'code' ? (
-              <CodePanel />
-            ) : (
-              <div className="p-4 sm:p-5">
-                <p className="sr-only">Contoh tampilan dashboard yang sudah jadi.</p>
-                <ProjectMockup kind="dashboard" />
-              </div>
-            )}
-          </div>
+          <CodePanel />
         </div>
       </div>
     </div>

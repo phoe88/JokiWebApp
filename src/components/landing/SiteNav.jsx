@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { LayoutDashboard, Menu, X } from 'lucide-react';
+import { LayoutTemplate, Menu, X } from 'lucide-react';
 import { NAV_SECTIONS } from '../../content/landing';
 import { useActiveSection } from '../../hooks/useActiveSection';
+import TemplateLink from '../TemplateLink';
+import AccountControl from '../shell/AccountControl';
 import Logo from '../shell/Logo';
 import ScrambleText from './ScrambleText';
+import SectionLink from './SectionLink';
+
+const CTA_LABEL = 'Mulai cari template website';
 
 const SECTION_IDS = NAV_SECTIONS.map(({ id }) => id);
 
@@ -44,27 +48,25 @@ function MobileDrawer({ open, onClose }) {
           <ul className="flex flex-col gap-1">
             {NAV_SECTIONS.map(({ id, label }) => (
               <li key={id}>
-                <a
-                  href={`#${id}`}
+                <SectionLink
+                  id={id}
                   onClick={onClose}
                   className="block rounded-xl px-3 py-3 font-display text-lg font-semibold text-ink hover:bg-white/5"
                 >
                   {label}
-                </a>
+                </SectionLink>
               </li>
             ))}
-            <li className="mt-2 border-t border-white/10 pt-2">
-              <Link to="/dashboard" className="flex items-center gap-2 rounded-xl px-3 py-3 text-sm text-ink-muted hover:bg-white/5">
-                <LayoutDashboard aria-hidden className="size-4" />
-                Dashboard
-              </Link>
-            </li>
           </ul>
         </nav>
 
-        <Link to="/services" className="btn btn-primary w-full">
-          Mulai Project
-        </Link>
+        <div className="flex flex-col gap-2">
+          <AccountControl block onAction={onClose} />
+          <TemplateLink onClick={onClose} className="btn btn-primary w-full">
+            <LayoutTemplate aria-hidden className="size-4" />
+            {CTA_LABEL}
+          </TemplateLink>
+        </div>
       </div>
     </dialog>
   );
@@ -79,32 +81,32 @@ export default function SiteNav() {
       <div className="glass glass-bar flex items-center gap-2 rounded-2xl py-2 pl-3 pr-2">
         <Logo />
 
-        <nav aria-label="Menu utama" className="mx-auto hidden md:block">
+        <nav aria-label="Menu utama" className="mx-auto hidden lg:block">
           <ul className="flex items-center gap-1">
             {NAV_SECTIONS.map(({ id, label }) => (
               <li key={id}>
-                <a href={`#${id}`} aria-current={active === id ? 'location' : undefined} className="nav-anchor glitch-host">
+                <SectionLink id={id} aria-current={active === id ? 'location' : undefined} className="nav-anchor glitch-host">
                   <ScrambleText text={label} />
-                </a>
+                </SectionLink>
               </li>
             ))}
           </ul>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 md:ml-0">
-          <Link to="/dashboard" aria-label="Dashboard" title="Dashboard" className="icon-btn hidden md:inline-flex">
-            <LayoutDashboard aria-hidden className="size-4" />
-          </Link>
-          <Link to="/services" className="btn btn-primary glitch-host hidden px-4 py-2 sm:inline-flex">
-            <ScrambleText text="Mulai Project" />
-          </Link>
+        <div className="ml-auto flex items-center gap-2 lg:ml-0">
+          <div className="hidden sm:flex">
+            <AccountControl />
+          </div>
+          <TemplateLink className="btn btn-primary glitch-host hidden px-4 py-2 sm:inline-flex">
+            <ScrambleText text={CTA_LABEL} />
+          </TemplateLink>
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
             aria-label="Buka menu"
             aria-expanded={drawerOpen}
             aria-controls="site-drawer"
-            className="icon-btn md:hidden"
+            className="icon-btn lg:hidden"
           >
             <Menu aria-hidden className="size-5" />
           </button>

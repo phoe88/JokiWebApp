@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Check, Copy, MessagesSquare, Send } from 'lucide-react';
 import { WHATSAPP_NUMBER } from '../../config/site';
 import { CONSULT_TIMELINES, SERVICES } from '../../content/landing';
 import { useToast } from '../../context/ToastContext';
 import Modal from '../Modal';
+import TemplateLink from '../TemplateLink';
 
 const MIN_BRIEF_LENGTH = 10;
 
@@ -80,16 +80,14 @@ function ConsultForm() {
       ) : (
         <>
           <p className="glass-inset p-3 text-sm leading-relaxed text-ink-muted">
-            Kanal konsultasi belum dibuka. Salin ringkasan ini untuk kamu kirim nanti, atau langsung pesan dari katalog.
+            Kanal konsultasi belum dibuka. Salin ringkasan ini untuk kamu kirim nanti, atau lihat template yang sudah ada.
           </p>
           <div className="flex flex-col gap-2 sm:flex-row">
             <button type="button" disabled={!ready} onClick={copy} className="btn btn-ghost flex-1 disabled:cursor-not-allowed">
               {copied ? <Check aria-hidden className="size-4 text-live" /> : <Copy aria-hidden className="size-4" />}
               {copied ? 'Tersalin' : 'Salin Ringkasan'}
             </button>
-            <Link to="/services" className="btn btn-primary flex-1">
-              Buka Katalog
-            </Link>
+            <TemplateLink className="btn btn-primary flex-1">Lihat Template</TemplateLink>
           </div>
         </>
       )}

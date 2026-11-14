@@ -71,7 +71,6 @@ export const PROJECTS = [
     summary: 'Dashboard untuk melacak order, nilai, dan status pengerjaan secara realtime.',
     details: ['Grafik nilai order per periode', 'Status order yang ter-update langsung', 'Tampilan khusus untuk ponsel'],
     stack: ['React', 'Tailwind', 'Supabase'],
-    previewUrl: '/dashboard',
   },
   {
     id: 'service-catalog',
@@ -81,7 +80,6 @@ export const PROJECTS = [
     summary: 'Katalog layanan dengan pencarian realtime, filter kategori, dan alur pemesanan.',
     details: ['Pencarian saat mengetik', 'Filter kategori', 'Order tersimpan ke database'],
     stack: ['React', 'Tailwind', 'Supabase'],
-    previewUrl: '/services',
   },
   {
     id: 'this-landing',
@@ -131,7 +129,12 @@ export const COMMUNITY_BENEFITS = [
   { icon: Handshake, title: 'Kolaborasi', body: 'Bertemu klien dan developer lain untuk kerja bareng.' },
 ];
 
-export const COMMUNITY_TOPICS = ['tanya-jawab', 'review-kode', 'showcase', 'pengumuman'];
+export const COMMUNITY_TOPICS = [
+  { id: 'tanya-jawab', note: 'Tanya apa saja soal kode, error, atau stack yang sedang kamu pakai.' },
+  { id: 'review-kode', note: 'Kirim potongan kode dan dapat masukan supaya lebih rapi dan aman.' },
+  { id: 'showcase', note: 'Pamerkan project yang sudah jadi dan dapat tanggapan dari anggota lain.' },
+  { id: 'pengumuman', note: 'Kabar layanan, jadwal, dan info terbaru dari JokiWebApp.' },
+];
 
 export const FAQS = [
   {

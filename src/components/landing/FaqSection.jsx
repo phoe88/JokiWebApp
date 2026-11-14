@@ -38,8 +38,7 @@ export default function FaqSection({ onConsult }) {
     <section id="faq" aria-labelledby="faq-title" className="page-shell scroll-mt-28 py-20 lg:py-24">
       <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-14">
         <Reveal className="min-w-0">
-          <p className="code-tag">{'// faq'}</p>
-          <h2 id="faq-title" className="mt-3 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+          <h2 id="faq-title" className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             Yang sering ditanyakan
           </h2>
           <p className="mt-3 text-base leading-relaxed text-ink-muted sm:text-lg">

@@ -1,18 +1,22 @@
-import { KeyRound, LockKeyhole } from 'lucide-react';
+import { LockKeyhole, LogIn } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Notice from './Notice';
 
-export default function SignInGate({ body }) {
+/** Shown in place of a page that needs an account. */
+export default function SignInGate({ title = 'Masuk untuk melanjutkan', body }) {
   const { openLogin } = useAuth();
+  const { pathname } = useLocation();
+
   return (
     <Notice
       icon={LockKeyhole}
-      title="Authentication required"
+      title={title}
       body={body}
       action={
-        <button type="button" onClick={() => openLogin()} className="btn btn-primary mt-6">
-          <KeyRound aria-hidden className="size-4" />
-          Secure Login
+        <button type="button" onClick={() => openLogin(null, pathname)} className="btn btn-primary mt-6">
+          <LogIn aria-hidden className="size-4" />
+          Masuk atau Daftar
         </button>
       }
     />
