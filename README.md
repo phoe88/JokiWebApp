@@ -31,12 +31,15 @@ JokiWebApp/
     ├── index.css                Tokens, glass levels, landing, motion, fallbacks
     ├── content/
     │   ├── landing.js           Landing page copy, projects, community topics, FAQ
+    │   ├── playlist.js          Coding playlist tracks
+    │   ├── techStack.js         Technology logos and the hero stack
     │   └── templates.js         Template categories and entries
     ├── config/
     │   ├── site.js              WhatsApp, community and social links
     │   └── brand.js             App name and tagline
+    ├── lib/synth.js             Web Audio sequencer that plays the playlist
     ├── context/ToastContext.jsx Notifications
-    ├── hooks/                   Active section, scroll reveal, reduced motion
+    ├── hooks/                   Active section, scroll reveal, reduced motion, playlist player
     ├── components/
     │   ├── landing/             SiteNav, Hero, CodeWindow, the sections, ConsultModal, SiteFooter, ScrambleText
     │   ├── shell/               Logo, SitePage, glow
@@ -70,6 +73,15 @@ If `npm` is not on your PATH but Corepack is, this works the same way. The repos
 corepack pnpm@latest install
 corepack pnpm@latest run dev
 ```
+
+## Coding playlist
+
+The landing page's **Playlist ngoding** section lists tracks from `src/content/playlist.js`. Each card can play or pause its track, mark it as a favourite, and open a details dialog.
+
+- The music is original and synthesised in the browser by `src/lib/synth.js`, so there are no audio files or licences. Each track sets a style (lofi, synthwave, ambient or chiptune), a tempo, a root note and four chords.
+- To play a real recording instead, give the track `src`: a file in `public/`, such as `/music/song.mp3`, or a full URL. Only use music you have the rights to.
+- Only one track plays at a time. A paused track resumes from the bar it reached.
+- Favourites are kept in the visitor's browser (`localStorage`), so they don't follow them to another device.
 
 ## Design system
 

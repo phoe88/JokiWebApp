@@ -596,6 +596,106 @@ html:has(.landing) {
   transform: translateY(0) scale(0.95);
 }
 
+/* Playlist: compact track cards, each on its own muted colour */
+.track-card {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  min-width: 0;
+  padding: 0.625rem 0.5rem 0.625rem 0.625rem;
+  border-radius: 0.75rem;
+  background: var(--tone);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.track-card:hover {
+  background: color-mix(in srgb, var(--tone), white 6%);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.track-card[data-playing='true'] {
+  border-color: rgb(var(--live) / 0.45);
+  box-shadow: 0 10px 30px -18px rgb(var(--live) / 0.7);
+}
+
+.track-art {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.6);
+}
+
+.track-eq {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  padding-bottom: 22%;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.track-eq span {
+  width: 3px;
+  height: 40%;
+  border-radius: 1px;
+  background: rgb(var(--live));
+  transform-origin: bottom;
+  animation: track-eq 0.9s ease-in-out infinite;
+}
+
+.track-eq span:nth-child(2) {
+  height: 60%;
+  animation-delay: -0.3s;
+}
+
+.track-eq span:nth-child(3) {
+  height: 30%;
+  animation-delay: -0.6s;
+}
+
+@keyframes track-eq {
+  0%,
+  100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+.track-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  color: rgba(255, 255, 255, 0.78);
+  transition: color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+.track-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.track-btn:active {
+  transform: scale(0.92);
+}
+
+.track-btn--fav[aria-pressed='true'] {
+  color: rgb(var(--live));
+}
+
+.track-btn--play {
+  color: #fff;
+}
+
+.track-card[data-playing='true'] .track-btn--play {
+  color: rgb(var(--live));
+}
+
 .section-rule {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgb(var(--live) / 0.28), rgb(var(--cyber) / 0.28), transparent);
@@ -1086,6 +1186,7 @@ html:has(.landing) {
   .field,
   .search-shell,
   .tech-logo,
+  .track-card,
   .tech-tag {
     border: 1px solid CanvasText;
     -webkit-backdrop-filter: none;
