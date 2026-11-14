@@ -1263,6 +1263,16 @@ html:has(.landing) {
   animation: rgb-split 0.45s steps(4) 1;
 }
 
+/* Scramble cells: each keeps the width of the letter it replaces, so only the glyph changes */
+.glitch-word {
+  white-space: nowrap;
+}
+
+.glitch-cell {
+  display: inline-flex;
+  justify-content: center;
+}
+
 @keyframes rgb-split {
   0%,
   100% {
