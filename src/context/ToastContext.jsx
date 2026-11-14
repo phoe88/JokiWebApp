@@ -38,7 +38,7 @@ export function ToastProvider({ children }) {
       <div
         role="status"
         aria-live="polite"
-        className="fixed bottom-[calc(var(--tabbar-height)+1.25rem+env(safe-area-inset-bottom))] right-3 z-50 flex w-[min(24rem,calc(100vw-1.5rem))] flex-col gap-2 lg:bottom-4 lg:right-4"
+        className="fixed bottom-[calc(1rem+var(--toast-lift,0px)+env(safe-area-inset-bottom))] right-3 z-50 flex w-[min(24rem,calc(100vw-1.5rem))] flex-col gap-2 lg:right-4"
       >
         {toasts.map((toast) => {
           const tone = TONES[toast.tone];

@@ -20,7 +20,7 @@ export default function SiteFooter() {
   const handles = [...COMMUNITY_CHANNELS, ...SOCIAL_LINKS].filter(({ url }) => url);
 
   return (
-    <footer className="page-shell pb-10 pt-6">
+    <footer className="page-shell pb-24 pt-6">
       <div className="section-rule" />
       <div className="mt-10 grid grid-cols-2 gap-8 md:grid-cols-[minmax(0,1.6fr)_repeat(3,minmax(0,1fr))]">
         <div className="col-span-2 md:col-span-1">

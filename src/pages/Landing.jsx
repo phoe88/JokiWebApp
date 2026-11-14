@@ -4,7 +4,7 @@ import CommunitySection from '../components/landing/CommunitySection';
 import ConsultModal from '../components/landing/ConsultModal';
 import FaqSection from '../components/landing/FaqSection';
 import Hero from '../components/landing/Hero';
-import PlaylistSection from '../components/landing/PlaylistSection';
+import MusicDock from '../components/landing/MusicDock';
 import PortfolioSection from '../components/landing/PortfolioSection';
 import ServicesSection from '../components/landing/ServicesSection';
 import SiteFooter from '../components/landing/SiteFooter';
@@ -30,10 +30,10 @@ export default function Landing() {
         <ServicesSection />
         <PortfolioSection />
         <CommunitySection />
-        <PlaylistSection />
         <FaqSection onConsult={openConsult} />
       </main>
       <SiteFooter />
+      <MusicDock />
       <ConsultModal open={consultOpen} onClose={() => setConsultOpen(false)} />
     </div>
   );

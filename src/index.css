@@ -48,7 +48,6 @@
     --rail: 4.5rem;
     --frame-max: 120rem;
     --frame-gutter: calc(max(0px, (100vw - var(--frame-max)) / 2) + 1rem);
-    --tabbar-height: 4rem;
 
     color-scheme: dark;
   }
@@ -488,6 +487,10 @@
 }
 
 /* Landing page */
+html:has(.music-dock) {
+  --toast-lift: 4.5rem;
+}
+
 html:has(.landing) {
   scroll-behavior: smooth;
   scroll-padding-top: 6.5rem;
@@ -694,6 +697,122 @@ html:has(.landing) {
 
 .track-card[data-playing='true'] .track-btn--play {
   color: rgb(var(--live));
+}
+
+/*
+ * Floating playlist. The dock is a fixed copy of the nav's page-shell, so the button's
+ * right edge lines up with the nav bar's last button (the bar's 0.5rem right padding
+ * plus its 1px border) at every width, and the panel lines up with the bar itself.
+ */
+.music-dock {
+  position: fixed;
+  inset-inline: 0;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.music-dock > * {
+  pointer-events: auto;
+}
+
+.music-fab {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-right: calc(0.5rem + 1px);
+  border-radius: 9999px;
+  color: var(--on-accent);
+  background: var(--accent-gradient);
+  box-shadow: 0 12px 32px -10px rgb(var(--live) / 0.55), var(--elevation-2);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.music-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px -10px rgb(var(--live) / 0.7), var(--elevation-2);
+}
+
+.music-fab:active {
+  transform: scale(0.96);
+}
+
+.music-fab:focus-visible {
+  outline: 2px solid rgb(var(--cyber));
+  outline-offset: 3px;
+}
+
+.music-fab__eq .song-eq-bar {
+  width: 4px;
+  background: var(--on-accent);
+}
+
+.music-fab__eq > span {
+  height: 1.125rem;
+  gap: 3px;
+}
+
+.music-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* Leaves room for the sticky nav above and the button below. */
+  max-height: calc(100dvh - 11rem);
+  overflow: hidden;
+  transform-origin: bottom right;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0s;
+}
+
+@media (min-width: 640px) {
+  .music-panel {
+    width: min(26rem, 100%);
+  }
+}
+
+.music-panel:not([data-open='true']) {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(0.75rem) scale(0.98);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0s linear 0.18s;
+}
+
+.music-panel__head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 0.875rem 0.875rem 1rem;
+  border-bottom: 1px solid var(--glass-line);
+}
+
+.music-panel__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.music-panel__section {
+  padding: 1rem;
+}
+
+.music-panel__section + .music-panel__section {
+  border-top: 1px solid var(--glass-line);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-panel,
+  .music-panel:not([data-open='true']),
+  .music-fab {
+    transition: none;
+  }
 }
 
 /* Playlist: the featured YouTube song and the song search */

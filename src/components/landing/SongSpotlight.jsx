@@ -5,7 +5,7 @@ import { useSongSearch } from '../../hooks/useSongSearch';
 
 const SUGGESTIONS = ['Tulus', 'Hindia', 'Nadin Amizah', 'Lo-fi'];
 
-function Equalizer() {
+export function Equalizer() {
   return (
     <span aria-hidden className="inline-flex h-3 items-end gap-[2px]">
       {[0, 1, 2].map((bar) => (
@@ -15,15 +15,15 @@ function Equalizer() {
   );
 }
 
-const STATUS_TEXT = { idle: 'Lagu utama', loading: 'Memuat…', playing: 'Sedang diputar', paused: 'Dijeda' };
+const STATUS_TEXT = { idle: 'Siap diputar', loading: 'Memuat…', playing: 'Sedang diputar', paused: 'Dijeda' };
 
 /** The featured song's video. Until someone presses play it is only a thumbnail, so YouTube loads nothing. */
-function SongPlayer({ player, song }) {
+export function FeaturedSong({ player, song = FEATURED_SONG }) {
   const { containerRef, status, started, play } = player;
 
   return (
-    <div className="glass overflow-hidden p-3 sm:p-4">
-      <div className="relative aspect-video overflow-hidden rounded-2xl bg-black">
+    <div>
+      <div className="relative aspect-video overflow-hidden rounded-xl bg-black">
         <div ref={containerRef} className="absolute inset-0 [&>iframe]:size-full" />
 
         {!started && (
@@ -46,9 +46,9 @@ function SongPlayer({ player, song }) {
             <span className="song-play-btn absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <Play aria-hidden className="size-6 translate-x-0.5 sm:size-7" fill="currentColor" />
             </span>
-            <span className="absolute inset-x-0 bottom-0 p-4 text-left sm:p-5">
+            <span className="absolute inset-x-0 bottom-0 p-3.5 text-left">
               <span className="badge-featured">Lagu utama</span>
-              <span className="mt-2 block font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">
+              <span className="mt-1.5 block font-display text-xl font-extrabold leading-tight text-white">
                 {song.title}
               </span>
               <span className="block text-sm text-white/75">
@@ -59,7 +59,7 @@ function SongPlayer({ player, song }) {
         )}
       </div>
 
-      <div className="mt-3 px-1" aria-live="polite">
+      <div className="mt-2.5 px-0.5" aria-live="polite">
         <p className="flex items-center gap-2 text-xs font-medium text-ink-dim">
           {status === 'playing' && <Equalizer />}
           {status === 'loading' && <LoaderCircle aria-hidden className="size-3.5 animate-spin" />}
@@ -146,7 +146,7 @@ function SongResult({ song, preview }) {
 }
 
 /** Song search on iTunes, with each result's 30-second preview playable in place. */
-function SongSearch({ preview }) {
+export function SongSearch({ preview }) {
   const { status, query, items, error, search } = useSongSearch();
   const [text, setText] = useState('');
 
@@ -156,17 +156,14 @@ function SongSearch({ preview }) {
   };
 
   return (
-    <div className="glass flex min-w-0 flex-col p-4 sm:p-5">
-      <h3 className="font-display text-lg font-bold text-ink">Cari lagu lain</h3>
-      <p className="mt-1 text-sm text-ink-muted">Cari dari iTunes dan dengarkan pratinjau 30 detiknya.</p>
-
+    <div className="min-w-0">
       <form
         role="search"
         onSubmit={(event) => {
           event.preventDefault();
           search(text);
         }}
-        className="search-shell mt-4 flex items-center gap-2 rounded-xl pl-3.5 pr-1.5"
+        className="search-shell flex items-center gap-2 rounded-xl pl-3.5 pr-1.5"
       >
         <Search aria-hidden className="size-4 shrink-0 text-cyber-soft" />
         <label htmlFor="song-search" className="sr-only">
@@ -208,7 +205,7 @@ function SongSearch({ preview }) {
         {status === 'done' && `${items.length} lagu ditemukan untuk ${query}.`}
       </p>
 
-      <div className="mt-4 min-h-0 flex-1">
+      <div className="mt-3">
         {status === 'idle' && (
           <div>
             <p className="text-xs text-ink-dim">Coba cari:</p>
@@ -239,7 +236,7 @@ function SongSearch({ preview }) {
         )}
 
         {status === 'done' && items.length > 0 && (
-          <ul className="song-results -mx-1.5 max-h-[22rem] space-y-0.5 overflow-y-auto pr-1">
+          <ul className="song-results -mx-1.5 max-h-[17.5rem] space-y-0.5 overflow-y-auto pr-1">
             {items.map((song) => (
               <SongResult key={song.id} song={song} preview={preview} />
             ))}
@@ -252,16 +249,6 @@ function SongSearch({ preview }) {
           Pratinjau 30 detik disediakan oleh iTunes. Lagu lengkapnya ada di Apple Music.
         </p>
       )}
-    </div>
-  );
-}
-
-/** The featured YouTube song beside a song search with iTunes previews. */
-export default function SongSpotlight({ player, preview }) {
-  return (
-    <div className="mt-10 grid items-start gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-      <SongPlayer player={player} song={FEATURED_SONG} />
-      <SongSearch preview={preview} />
     </div>
   );
 }
