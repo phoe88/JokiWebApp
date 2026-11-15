@@ -22,21 +22,14 @@ export const FOUNDER = {
 };
 
 /**
- * The stack behind JokiWebApp, grouped by layer. Each `name` must match an entry in
- * techStack.js so its logo shows.
+ * The stack behind JokiWebApp. Each `name` must match an entry in techStack.js so
+ * its logo shows.
  */
 export const FOUNDER_STACK = [
-  {
-    group: 'Backend',
-    items: [
-      {
-        name: 'Laravel',
-        note: 'Backend application framework, API development, business logic, and server-side architecture.',
-      },
-      {
-        name: 'PHP',
-        note: 'Core server-side language that powers the Laravel backend.',
-      },
-    ],
-  },
+  { name: 'React', role: 'Frontend' },
+  { name: 'Laravel', role: 'Backend' },
+  { name: 'Tailwind CSS', role: 'Styling' },
+  { name: 'Supabase', role: 'Auth & storage' },
+  { name: 'PostgreSQL', role: 'Database' },
+  { name: 'Node.js', role: 'Runtime & tooling' },
 ];

@@ -1364,28 +1364,37 @@ html:has(.landing) {
 
 .founder-grid__body {
   grid-area: body;
+  max-width: 48rem;
 }
 
-@media (min-width: 1024px) {
+/* Wide screens: the portrait spans both rows, so the text column is exactly as tall as the card.
+   The heading starts at the card's top edge and the tech stack ends at its bottom edge. */
+@media (min-width: 1280px) {
   .founder-grid {
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
     grid-template-areas: 'head photo' 'body photo';
     grid-template-rows: auto 1fr;
     column-gap: 4rem;
-    row-gap: 2rem;
+    row-gap: 1.5rem;
   }
 
   .founder-grid__photo {
+    display: flex;
     max-width: 30rem;
     justify-self: end;
-    align-self: start;
-    position: sticky;
-    top: 7rem;
+  }
+
+  .founder-grid__photo > .founder-portrait {
+    flex: 1;
+  }
+
+  .founder-grid__body {
+    max-width: none;
   }
 }
 
 .founder-label {
-  @apply inline-flex items-center gap-2 font-mono text-xs uppercase text-ink-muted;
+  @apply flex w-fit items-center gap-2 font-mono text-xs uppercase leading-none text-ink-muted;
   letter-spacing: 0.22em;
 }
 
@@ -1415,20 +1424,46 @@ html:has(.landing) {
   }
 }
 
-.founder-stack__row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.875rem;
-  padding: 0.75rem;
-  border-radius: 0.875rem;
-  border: 1px solid transparent;
-  transition: border-color 0.18s ease, background-color 0.18s ease;
+@media (min-width: 1280px) {
+  .founder-bio {
+    margin-top: 1.25rem;
+    gap: 0.75rem;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
 }
 
-.founder-stack__row:hover,
-.founder-stack__row:focus-within {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: var(--glass-line);
+.founder-stack__tile {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: border-color 0.18s ease, background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Phones: logo above the name, so names and roles get the tile's full width */
+@media (max-width: 639px) {
+  .founder-stack__tile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.625rem;
+  }
+}
+
+.founder-stack__tile:hover,
+.founder-stack__tile:focus-visible {
+  background: color-mix(in srgb, var(--brand) 8%, transparent);
+  border-color: color-mix(in srgb, var(--brand) 45%, transparent);
+  box-shadow: 0 0 18px -8px var(--brand);
+  transform: translateY(-2px);
+}
+
+.founder-stack__tile:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .founder-stack__logo {
@@ -1441,21 +1476,12 @@ html:has(.landing) {
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 30%, transparent);
 }
 
-.founder-stack__link {
-  text-underline-offset: 3px;
-}
-
-.founder-stack__link:hover {
-  text-decoration: underline;
-  text-decoration-color: rgb(var(--ink-dim));
-}
-
 /* The portrait is a cut-out with a black suit, so a soft light behind the shoulders keeps its outline readable on the dark page */
 .founder-portrait {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  aspect-ratio: 4 / 5;
+  margin: 0;
   border-radius: 2rem;
   border: 1px solid var(--glass-line);
   background:
@@ -1463,6 +1489,12 @@ html:has(.landing) {
     linear-gradient(180deg, #1c1e1d 0%, #121413 100%);
   box-shadow: var(--glass-highlight), var(--elevation-3);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.founder-portrait::before {
+  content: '';
+  display: block;
+  padding-top: 125%;
 }
 
 .founder-portrait__grid {
@@ -1481,8 +1513,10 @@ html:has(.landing) {
   position: absolute;
   left: 50%;
   bottom: 0;
-  width: 92%;
-  height: auto;
+  width: 100%;
+  height: 92%;
+  object-fit: contain;
+  object-position: 50% 100%;
   transform: translateX(-50%);
   transform-origin: 50% 100%;
   transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -1645,6 +1679,7 @@ html:has(.landing) {
   .tech-logo,
   .founder-portrait,
   .founder-portrait__tag,
+  .founder-stack__tile,
   .track-card,
   .song-chip,
   .tech-tag {
