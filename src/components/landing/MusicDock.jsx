@@ -3,7 +3,7 @@ import { Heart, Music, Pause, Play, X } from 'lucide-react';
 import { TRACKS } from '../../content/playlist';
 import { useToast } from '../../context/ToastContext';
 import { useFavoriteTracks, usePlaylistPlayer } from '../../hooks/usePlaylistPlayer';
-import { usePreviewPlayer } from '../../hooks/usePreviewPlayer';
+import { useSongPlayer } from '../../hooks/useSongPlayer';
 import { useYouTubePlayer } from '../../hooks/useYouTubePlayer';
 import Modal from '../Modal';
 import { Equalizer, FeaturedSong, SongSearch } from './SongSpotlight';
@@ -92,16 +92,16 @@ export default function MusicDock() {
     [notify],
   );
 
-  // One sound at a time: the featured video, the search previews and the original tracks pause each other.
+  // One sound at a time: the featured video, the searched songs and the original tracks pause each other.
   const pauseOthersRef = useRef({});
   const youtube = useYouTubePlayer({ onPlay: () => pauseOthersRef.current.youtube(), onError: onVideoError });
-  const preview = usePreviewPlayer({ onPlay: () => pauseOthersRef.current.preview(), onError });
+  const songs = useSongPlayer({ onPlay: () => pauseOthersRef.current.songs(), onNotice: notify });
   pauseOthersRef.current = {
     youtube: () => {
       pauseTrack();
-      preview.pause();
+      songs.pause();
     },
-    preview: () => {
+    songs: () => {
       pauseTrack();
       youtube.pause();
     },
@@ -109,7 +109,7 @@ export default function MusicDock() {
   const toggle = (track) => {
     if (!isPlaying(track.id)) {
       youtube.pause();
-      preview.pause();
+      songs.pause();
     }
     toggleTrack(track);
   };
@@ -120,7 +120,7 @@ export default function MusicDock() {
   const [open, setOpen] = useState(false);
   const dockRef = useRef(null);
   const buttonRef = useRef(null);
-  const anythingPlaying = trackPlaying || youtube.status === 'playing' || preview.status === 'playing';
+  const anythingPlaying = trackPlaying || youtube.status === 'playing' || songs.status === 'playing';
 
   // Escape or a click elsewhere on the page closes the panel. A dialog opened from the
   // panel (track info) handles its own Escape, so the panel stays open behind it.
@@ -144,6 +144,8 @@ export default function MusicDock() {
 
   return (
     <div ref={dockRef} className="music-dock page-shell">
+      {/* The searched song plays here, out of sight, so it keeps going while the panel is closed. */}
+      <div ref={songs.containerRef} aria-hidden inert className="song-player-host [&>iframe]:size-full" />
       <div
         id="music-panel"
         role="dialog"
@@ -180,8 +182,8 @@ export default function MusicDock() {
             <FeaturedSong player={youtube} />
           </PanelSection>
 
-          <PanelSection title="Cari lagu lain" body="Dari iTunes, dengarkan pratinjau 30 detiknya.">
-            <SongSearch preview={preview} />
+          <PanelSection title="Cari lagu lain" body="Putar lagu lengkapnya, sampai selesai.">
+            <SongSearch player={songs} />
           </PanelSection>
 
           <PanelSection title="Musik original" body="Disintesis langsung di browser kamu, tanpa iklan dan tanpa unduhan.">

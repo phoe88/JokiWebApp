@@ -12,7 +12,7 @@ const MAX_QUERY_LENGTH = 100;
 /** Same words, same cache entry. */
 const normalize = (query) => query.trim().replace(/\s+/g, ' ').toLowerCase();
 
-/** Keeps the fields the page uses. Songs without a preview can't be played, so they're dropped. */
+/** Keeps the fields the page uses. `duration` is the song's length in seconds. */
 function toSong(result) {
   return {
     id: String(result.trackId),
@@ -20,14 +20,14 @@ function toSong(result) {
     artist: result.artistName,
     album: result.collectionName,
     artwork: result.artworkUrl100?.replace(/\/100x100bb\./, '/200x200bb.'),
+    duration: Math.round((result.trackTimeMillis ?? 0) / 1000),
     previewUrl: result.previewUrl,
-    storeUrl: result.trackViewUrl,
   };
 }
 
 /**
  * Returns { status: 'idle' | 'loading' | 'done' | 'error', query, items, error, search }.
- * Each item is { id, title, artist, album, artwork, previewUrl, storeUrl }.
+ * Each item is { id, title, artist, album, artwork, duration, previewUrl }.
  */
 export function useSongSearch() {
   const [state, setState] = useState({ status: 'idle', query: '', items: [], error: '' });
@@ -68,7 +68,7 @@ export function useSongSearch() {
       if (!response.ok || !Array.isArray(payload?.results)) {
         throw new Error('Pencarian lagu sedang tidak tersedia. Coba lagi nanti.');
       }
-      const items = payload.results.filter((result) => result.kind === 'song' && result.previewUrl).map(toSong);
+      const items = payload.results.filter((result) => result.kind === 'song').map(toSong);
       cacheRef.current.set(query, items);
       setState({ status: 'done', query, items, error: '' });
     } catch (error) {

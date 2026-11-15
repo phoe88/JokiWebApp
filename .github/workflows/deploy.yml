@@ -30,6 +30,8 @@ jobs:
       - run: pnpm build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
+          # GitHub Pages has no server, so full-song lookups go to the Vercel copy of api/.
+          VITE_SONG_VIDEO_URL: https://jokiwebapp.vercel.app/api/song-video
       # GitHub Pages serves 404.html for unknown paths, which lets deep links reach the router.
       - run: cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3

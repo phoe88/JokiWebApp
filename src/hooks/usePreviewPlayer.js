@@ -3,7 +3,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 /**
  * Plays the 30-second song previews from search results, one at a time, through a
  * single audio element. The audio is streamed, never saved, as Apple's terms require.
- * `onPlay` fires whenever a preview starts.
+ * `onPlay` fires whenever a preview starts. `useSongPlayer` falls back to these when a
+ * song's full version can't be found or played.
  */
 export function usePreviewPlayer({ onPlay, onError } = {}) {
   const audioRef = useRef(null);
@@ -11,8 +12,9 @@ export function usePreviewPlayer({ onPlay, onError } = {}) {
   callbacksRef.current = { onPlay, onError };
 
   const [currentId, setCurrentId] = useState(null);
-  const [status, setStatus] = useState('idle'); // idle | loading | playing | paused
+  const [status, setStatus] = useState('idle'); // idle | loading | playing | paused | ended
   const [progress, setProgress] = useState(0);
+  const [time, setTime] = useState({ current: 0, duration: 0 });
 
   const getAudio = useCallback(() => {
     if (audioRef.current) return audioRef.current;
@@ -25,11 +27,17 @@ export function usePreviewPlayer({ onPlay, onError } = {}) {
     audio.addEventListener('waiting', () => setStatus('loading'));
     audio.addEventListener('pause', () => setStatus((current) => (current === 'idle' ? current : 'paused')));
     audio.addEventListener('ended', () => {
-      setStatus('idle');
+      setStatus('ended');
       setProgress(0);
     });
     audio.addEventListener('timeupdate', () => {
-      if (audio.duration) setProgress(audio.currentTime / audio.duration);
+      if (!audio.duration) return;
+      setProgress(audio.currentTime / audio.duration);
+      const current = Math.floor(audio.currentTime);
+      const duration = Math.round(audio.duration);
+      setTime((previous) =>
+        previous.current === current && previous.duration === duration ? previous : { current, duration },
+      );
     });
     audioRef.current = audio;
     return audio;
@@ -38,7 +46,7 @@ export function usePreviewPlayer({ onPlay, onError } = {}) {
   const toggle = useCallback(
     async (song) => {
       const audio = getAudio();
-      const same = currentId === song.id && status !== 'idle';
+      const same = currentId === song.id && status !== 'idle' && status !== 'ended';
 
       if (same && (status === 'playing' || status === 'loading')) {
         audio.pause();
@@ -49,6 +57,7 @@ export function usePreviewPlayer({ onPlay, onError } = {}) {
         audio.src = song.previewUrl;
         setCurrentId(song.id);
         setProgress(0);
+        setTime({ current: 0, duration: 0 });
       }
       setStatus('loading');
       try {
@@ -64,6 +73,12 @@ export function usePreviewPlayer({ onPlay, onError } = {}) {
 
   const pause = useCallback(() => {
     audioRef.current?.pause();
+  }, []);
+
+  const stop = useCallback(() => {
+    audioRef.current?.pause();
+    setStatus('idle');
+    setProgress(0);
   }, []);
 
   useEffect(
@@ -82,8 +97,10 @@ export function usePreviewPlayer({ onPlay, onError } = {}) {
     currentId,
     status,
     progress,
+    time,
     toggle,
     pause,
-    isActive: (id) => currentId === id && status !== 'idle',
+    stop,
+    isActive: (id) => currentId === id && status !== 'idle' && status !== 'ended',
   };
 }

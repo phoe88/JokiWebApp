@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ExternalLink, LoaderCircle, Pause, Play, Search, SearchX, TriangleAlert, X } from 'lucide-react';
+import { LoaderCircle, Pause, Play, Search, SearchX, TriangleAlert, X } from 'lucide-react';
 import { FEATURED_SONG } from '../../content/playlist';
 import { useSongSearch } from '../../hooks/useSongSearch';
 
@@ -15,7 +15,7 @@ export function Equalizer() {
   );
 }
 
-const STATUS_TEXT = { idle: 'Siap diputar', loading: 'Memuat…', playing: 'Sedang diputar', paused: 'Dijeda' };
+const STATUS_TEXT = { idle: 'Siap diputar', loading: 'Memuat…', playing: 'Sedang diputar', paused: 'Dijeda', ended: 'Selesai diputar' };
 
 /** The featured song's video. Until someone presses play it is only a thumbnail, so YouTube loads nothing. */
 export function FeaturedSong({ player, song = FEATURED_SONG }) {
@@ -90,63 +90,87 @@ function ResultSkeleton() {
   );
 }
 
-/** One search result: the artwork and names play the preview, the link opens Apple Music. */
-function SongResult({ song, preview }) {
-  const active = preview.isActive(song.id);
-  const playing = active && preview.status === 'playing';
-  const loading = active && preview.status === 'loading';
-  const Icon = loading ? LoaderCircle : playing ? Pause : Play;
+/** 3:07, or 1:02:03 for anything an hour or longer. */
+export function formatTime(seconds = 0) {
+  const total = Math.max(0, Math.floor(seconds));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = String(total % 60).padStart(2, '0');
+  return h ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`;
+}
+
+const ROW_STATUS = {
+  finding: 'Mencari lagu lengkap…',
+  loading: 'Memuat…',
+};
+
+/** One search result. The whole row is one button that plays the full song or pauses it. */
+function SongResult({ song, player }) {
+  const active = player.isActive(song.id);
+  const playing = active && player.status === 'playing';
+  const busy = active && (player.status === 'finding' || player.status === 'loading');
+  const Icon = busy ? LoaderCircle : playing ? Pause : Play;
+  const { current, duration } = active ? player.time : { current: 0, duration: song.duration };
+  const progress = duration ? Math.min(1, current / duration) : 0;
+  const isPreview = active && player.source === 'preview';
 
   return (
-    <li className="song-result" data-active={active}>
+    <li>
       <button
         type="button"
-        onClick={() => preview.toggle(song)}
-        aria-label={`${playing || loading ? 'Jeda' : 'Putar'} pratinjau ${song.title} oleh ${song.artist}`}
-        className="flex min-w-0 flex-1 items-center gap-3 rounded-lg p-1.5 text-left"
+        onClick={() => player.toggle(song)}
+        aria-label={`${playing || busy ? 'Jeda' : 'Putar'} ${song.title} oleh ${song.artist}`}
+        data-active={active}
+        className="song-result w-full text-left"
       >
         <span className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-white/[0.06]">
           {song.artwork && (
             <img src={song.artwork} alt="" width="200" height="200" loading="lazy" decoding="async" className="size-full object-cover" />
           )}
-          <span className="song-result-overlay absolute inset-0 grid place-items-center bg-black/50 text-white">
-            <Icon aria-hidden className={`size-5 ${loading ? 'animate-spin' : ''}`} fill={loading ? 'none' : 'currentColor'} />
-          </span>
+          {playing && (
+            <span className="absolute inset-0 grid place-items-center bg-black/45">
+              <Equalizer />
+            </span>
+          )}
         </span>
+
         <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-2">
-            {playing && <Equalizer />}
-            <span className="truncate text-sm font-medium text-ink">{song.title}</span>
-          </span>
+          <span className="block truncate text-sm font-medium text-ink">{song.title}</span>
           <span className="mt-0.5 block truncate text-xs text-ink-dim">
             {song.artist}
             {song.album ? ` · ${song.album}` : ''}
           </span>
           {active && (
-            <span aria-hidden className="mt-1.5 block h-1 overflow-hidden rounded-full bg-white/10">
-              <span className="block h-full rounded-full bg-live" style={{ width: `${preview.progress * 100}%` }} />
+            <span className="mt-1.5 block">
+              {busy && !current ? (
+                <span className="block text-[11px] text-ink-dim">{ROW_STATUS[player.status]}</span>
+              ) : (
+                <span className="flex items-center gap-2 text-[11px] tabular-nums text-ink-dim">
+                  <span>{formatTime(current)}</span>
+                  <span aria-hidden className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
+                    <span className="song-progress block h-full rounded-full bg-live" style={{ width: `${progress * 100}%` }} />
+                  </span>
+                  <span>{formatTime(duration)}</span>
+                  {isPreview && <span className="text-cyber-soft">Pratinjau</span>}
+                </span>
+              )}
             </span>
           )}
         </span>
+
+        {!active && duration > 0 && (
+          <span className="shrink-0 text-xs tabular-nums text-ink-dim">{formatTime(duration)}</span>
+        )}
+        <span aria-hidden className="song-result-play">
+          <Icon className={`size-4 ${busy ? 'animate-spin' : playing ? '' : 'translate-x-px'}`} fill={busy ? 'none' : 'currentColor'} />
+        </span>
       </button>
-      {song.storeUrl && (
-        <a
-          href={song.storeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`Dengarkan ${song.title} di Apple Music (tab baru)`}
-          className="song-store"
-        >
-          <span className="hidden sm:inline">Apple Music</span>
-          <ExternalLink aria-hidden className="size-3.5" />
-        </a>
-      )}
     </li>
   );
 }
 
-/** Song search on iTunes, with each result's 30-second preview playable in place. */
-export function SongSearch({ preview }) {
+/** Song search on iTunes, with each result playable in full in place. */
+export function SongSearch({ player }) {
   const { status, query, items, error, search } = useSongSearch();
   const [text, setText] = useState('');
 
@@ -236,9 +260,9 @@ export function SongSearch({ preview }) {
         )}
 
         {status === 'done' && items.length > 0 && (
-          <ul className="song-results -mx-1.5 max-h-[17.5rem] space-y-0.5 overflow-y-auto pr-1">
+          <ul className="song-results -mx-1.5 max-h-[18.5rem] space-y-0.5 overflow-y-auto pr-1">
             {items.map((song) => (
-              <SongResult key={song.id} song={song} preview={preview} />
+              <SongResult key={song.id} song={song} player={player} />
             ))}
           </ul>
         )}
@@ -246,7 +270,7 @@ export function SongSearch({ preview }) {
 
       {status !== 'idle' && (
         <p className="mt-3 border-t border-white/[0.06] pt-3 text-xs leading-relaxed text-ink-dim">
-          Pratinjau 30 detik disediakan oleh iTunes. Lagu lengkapnya ada di Apple Music.
+          Data lagu dari iTunes. Lagu lengkapnya diputar dari YouTube.
         </p>
       )}
     </div>

@@ -15,3 +15,10 @@ export const SOCIAL_LINKS = [
   { name: 'Instagram', url: '' },
   { name: 'GitHub', url: '' },
 ];
+
+/**
+ * Finds the YouTube video of a searched song so it plays in full (api/song-video.js,
+ * hosted on Vercel). GitHub Pages has no server, so its build points
+ * VITE_SONG_VIDEO_URL at the Vercel copy.
+ */
+export const SONG_VIDEO_URL = import.meta.env.VITE_SONG_VIDEO_URL || '/api/song-video';
