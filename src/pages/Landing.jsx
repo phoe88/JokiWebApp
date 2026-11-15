@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import CommunitySection from '../components/landing/CommunitySection';
 import ConsultModal from '../components/landing/ConsultModal';
 import FaqSection from '../components/landing/FaqSection';
+import FounderSection from '../components/landing/FounderSection';
 import Hero from '../components/landing/Hero';
 import MusicDock from '../components/landing/MusicDock';
 import PortfolioSection from '../components/landing/PortfolioSection';
@@ -29,6 +30,7 @@ export default function Landing() {
         <div className="section-rule" />
         <ServicesSection />
         <PortfolioSection />
+        <FounderSection />
         <CommunitySection />
         <FaqSection onConsult={openConsult} />
       </main>
