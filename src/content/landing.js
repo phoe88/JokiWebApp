@@ -14,6 +14,7 @@ import {
 export const NAV_SECTIONS = [
   { id: 'layanan', label: 'Layanan' },
   { id: 'portofolio', label: 'Portofolio' },
+  { id: 'founder', label: 'Founder' },
   { id: 'komunitas', label: 'Komunitas' },
   { id: 'faq', label: 'FAQ' },
 ];
