@@ -8,7 +8,7 @@ function FaqItem({ question, answer, open, onToggle }) {
   const id = useId();
 
   return (
-    <div className="glass-soft rounded-2xl">
+    <div data-open={open} className="faq-item glass-soft rounded-2xl">
       <h3>
         <button
           type="button"
@@ -24,7 +24,7 @@ function FaqItem({ question, answer, open, onToggle }) {
       </h3>
       <div id={`${id}-panel`} role="region" aria-labelledby={`${id}-button`} data-open={open} className="faq-panel">
         <div>
-          <p className="px-5 pb-5 text-[15px] leading-relaxed text-ink-muted">{answer}</p>
+          <p className="faq-answer px-5 pb-5 text-[15px] leading-relaxed text-ink-muted">{answer}</p>
         </div>
       </div>
     </div>

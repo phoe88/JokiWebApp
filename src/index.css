@@ -1357,10 +1357,27 @@ html:has(.landing) {
 }
 
 /* FAQ */
+/*
+ * FAQ accordion. The panel's height animates from 0 to exactly its content's height
+ * (grid rows 0fr → 1fr), so the card grows by as much space as the answer needs,
+ * at any width. Opening: the space opens first and the answer fades and slides in
+ * just behind it. Closing: the answer fades out quickly, then the space closes.
+ * Every part shares one duration and curve so open and close feel the same.
+ */
+.faq-item {
+  --faq-duration: 0.42s;
+  --faq-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  transition: border-color var(--faq-duration) var(--faq-ease);
+}
+
+.faq-item[data-open='true'] {
+  border-color: rgb(var(--live) / 0.22);
+}
+
 .faq-panel {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.28s ease;
+  transition: grid-template-rows var(--faq-duration) var(--faq-ease);
 }
 
 .faq-panel[data-open='true'] {
@@ -1368,17 +1385,31 @@ html:has(.landing) {
 }
 
 .faq-panel > div {
+  min-height: 0;
   overflow: hidden;
   visibility: hidden;
-  transition: visibility 0.28s;
+  transition: visibility 0s linear var(--faq-duration);
 }
 
 .faq-panel[data-open='true'] > div {
   visibility: visible;
+  transition-delay: 0s;
+}
+
+.faq-answer {
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.faq-panel[data-open='true'] .faq-answer {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.32s ease 0.1s, transform var(--faq-duration) var(--faq-ease) 0.06s;
 }
 
 .faq-chevron {
-  transition: transform 0.22s ease;
+  transition: transform var(--faq-duration) var(--faq-ease);
 }
 
 [aria-expanded='true'] .faq-chevron {
