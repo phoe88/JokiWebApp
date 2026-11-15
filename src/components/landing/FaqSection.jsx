@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronDown, MessagesSquare } from 'lucide-react';
 import { FAQS } from '../../content/landing';
 import Reveal from './Reveal';
@@ -31,8 +31,50 @@ function FaqItem({ question, answer, open, onToggle }) {
   );
 }
 
+/**
+ * Keeps the FAQ list as tall as its tallest state, every question plus the longest
+ * answer, so opening, switching or closing an answer happens inside that space and
+ * the footer below never moves. Only one answer opens at a time, so that's the most
+ * the list ever needs. It's measured from the real content, so it fits any width,
+ * and it's measured again when the width or the fonts change.
+ */
+function useStableListHeight() {
+  const listRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) return undefined;
+
+    const measure = () => {
+      const items = [...list.children];
+      if (!items.length) return;
+      const gap = parseFloat(getComputedStyle(list).rowGap) || 0;
+      let closed = gap * (items.length - 1);
+      let longestAnswer = 0;
+      for (const item of items) {
+        const panel = item.querySelector('.faq-panel');
+        const answer = item.querySelector('.faq-answer');
+        // The item minus its panel's current height is the item closed, mid-animation or not.
+        closed += item.getBoundingClientRect().height - panel.getBoundingClientRect().height;
+        longestAnswer = Math.max(longestAnswer, answer.getBoundingClientRect().height);
+      }
+      list.style.minHeight = `${Math.ceil(closed + longestAnswer)}px`;
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    list.querySelectorAll('.faq-answer').forEach((answer) => observer.observe(answer));
+    document.fonts?.ready.then(measure);
+    return () => observer.disconnect();
+  }, []);
+
+  return listRef;
+}
+
 export default function FaqSection({ onConsult }) {
   const [openIndex, setOpenIndex] = useState(0);
+  const listRef = useStableListHeight();
 
   return (
     <section id="faq" aria-labelledby="faq-title" className="page-shell scroll-mt-28 py-20 lg:py-24">
@@ -50,16 +92,18 @@ export default function FaqSection({ onConsult }) {
           </button>
         </Reveal>
 
-        <Reveal delay={80} className="flex min-w-0 flex-col gap-3">
-          {FAQS.map(({ question, answer }, index) => (
-            <FaqItem
-              key={question}
-              question={question}
-              answer={answer}
-              open={openIndex === index}
-              onToggle={() => setOpenIndex((current) => (current === index ? null : index))}
-            />
-          ))}
+        <Reveal delay={80} className="min-w-0">
+          <div ref={listRef} className="flex flex-col gap-3">
+            {FAQS.map(({ question, answer }, index) => (
+              <FaqItem
+                key={question}
+                question={question}
+                answer={answer}
+                open={openIndex === index}
+                onToggle={() => setOpenIndex((current) => (current === index ? null : index))}
+              />
+            ))}
+          </div>
         </Reveal>
       </div>
     </section>
