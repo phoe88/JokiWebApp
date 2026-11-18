@@ -60,6 +60,8 @@ export const PORTFOLIO_FILTERS = [ALL_PROJECTS, 'Dashboard', 'E-commerce', 'Land
 /**
  * `sample: true` marks a design concept rather than client work, and the page says
  * so. Replace those entries with real projects as you collect them.
+ * `previewUrl` is an in-app route; `siteUrl` is a live external site that opens in a
+ * new tab. `description`, when present, replaces `summary` in the details modal.
  */
 export const PROJECTS = [
   {
@@ -88,6 +90,27 @@ export const PROJECTS = [
     summary: 'Halaman yang sedang kamu lihat: dark mode, glassmorphism, dan animasi ringan.',
     details: ['Responsif dari ponsel sampai layar lebar', 'Bisa dipakai dengan keyboard', 'Menghormati setelan kurangi animasi'],
     stack: ['React', 'Tailwind', 'Vite'],
+  },
+  {
+    id: 'vortex-racing',
+    title: 'Vortex Racing – Official Website',
+    category: 'Landing Page',
+    mock: 'racing',
+    summary:
+      'An immersive Formula 1 team website showcasing drivers, racing news, championship standings, and upcoming Grand Prix events.',
+    description:
+      'A modern Formula 1 team website featuring an immersive motorsport experience, driver profiles, race calendars, championship standings, racing news, and team information.',
+    details: [
+      'Formula 1 team homepage',
+      'Driver profiles and statistics',
+      'Race calendar and upcoming Grand Prix',
+      'Latest racing news and articles',
+      'Championship standings',
+      'Racing car showcase',
+      'Newsletter subscription',
+    ],
+    stack: ['Next.js', 'React', 'TypeScript', 'Tailwind', 'Supabase'],
+    siteUrl: 'https://vortexracing.vercel.app/',
   },
   {
     id: 'sample-store',

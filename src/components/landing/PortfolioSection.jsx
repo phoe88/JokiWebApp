@@ -14,6 +14,17 @@ function SampleTag() {
   return <span className="demo-tag">Contoh</span>;
 }
 
+/** A project's live site, outside this app, so it opens in a new tab. */
+function SiteLink({ url, className, iconClass }) {
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" className={className}>
+      <ExternalLink aria-hidden className={iconClass} />
+      Live Preview
+      <span className="sr-only"> (tab baru)</span>
+    </a>
+  );
+}
+
 function ProjectCard({ project, onDetails, index }) {
   return (
     <GlowCard
@@ -40,6 +51,7 @@ function ProjectCard({ project, onDetails, index }) {
               Live Preview
             </Link>
           )}
+          {project.siteUrl && <SiteLink url={project.siteUrl} className="btn btn-cyber flex-1 px-3 py-2 text-[13px]" iconClass="size-3.5" />}
         </div>
       </div>
     </GlowCard>
@@ -56,7 +68,7 @@ function ProjectDetails({ project, onClose }) {
             <p className="text-sm text-ink-dim">{project.category}</p>
             {project.sample && <SampleTag />}
           </div>
-          <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">{project.summary}</p>
+          <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">{project.description ?? project.summary}</p>
           <ul className="mt-4 flex flex-col gap-1.5">
             {project.details.map((detail) => (
               <li key={detail} className="flex items-start gap-2 text-sm text-ink-muted">
@@ -79,6 +91,7 @@ function ProjectDetails({ project, onClose }) {
               Live Preview
             </Link>
           )}
+          {project.siteUrl && <SiteLink url={project.siteUrl} className="btn btn-primary mt-5 w-full" iconClass="size-4" />}
         </>
       )}
     </Modal>
