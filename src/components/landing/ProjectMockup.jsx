@@ -87,130 +87,45 @@ function TableScreen() {
   );
 }
 
-/** Racing-team site: start lights, a side-on F1 car, and standings, race and driver cards. */
-const RACE_RED = '#e10600';
-
-function RaceCar({ className = '' }) {
-  return (
-    <svg viewBox="0 0 200 56" className={className}>
-      <g stroke="rgba(255,255,255,0.18)" strokeWidth="1.2" strokeLinecap="round">
-        <path d="M0 24 H20 M4 32 H18 M0 40 H12" />
-      </g>
-      <rect x="8" y="10" width="20" height="4" rx="1" fill={RACE_RED} />
-      <rect x="10" y="10" width="3" height="24" fill="#1a2440" />
-      <path d="M16 40 L22 30 L54 28 L66 18 L80 15 L86 22 L100 23 L114 27 L152 30 L184 35 L196 40 L188 42 L22 42 Z" fill="#18213a" />
-      <path d="M50 33 L112 30 L168 34 L186 38 L112 37 L50 38 Z" fill={RACE_RED} />
-      <path d="M66 18 L80 15 L84 20 L70 22 Z" fill={RACE_RED} />
-      <path d="M88 23 Q96 13 106 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" />
-      <path d="M162 43 H198 V46 H158 Z" fill={RACE_RED} />
-      <rect x="22" y="42" width="140" height="2.5" rx="1" fill="#0a0f1d" />
-      {[
-        [44, 41, 12],
-        [152, 42, 11],
-      ].map(([cx, cy, r]) => (
-        <g key={cx}>
-          <circle cx={cx} cy={cy} r={r} fill="#06080f" stroke="#2b3550" strokeWidth="2.5" />
-          <circle cx={cx} cy={cy} r={r / 3} fill="#3b4664" />
-        </g>
-      ))}
-    </svg>
-  );
-}
-
-function RacingScreen() {
-  const panel = 'rounded-md bg-white/[0.05] ring-1 ring-white/[0.06]';
-
-  return (
-    <div className="relative flex h-full flex-col overflow-hidden bg-gradient-to-br from-[#0d1530] via-[#070b18] to-[#04060c]">
-      <div
-        className="pointer-events-none absolute -right-1/4 -top-1/3 size-3/4 rounded-full opacity-40 blur-2xl"
-        style={{ background: `radial-gradient(circle, ${RACE_RED}, transparent 65%)` }}
-      />
-
-      <div className="relative flex items-center justify-between border-b border-white/[0.06] px-3 py-1.5">
-        <div className="flex items-center gap-1">
-          <span className="h-2 w-2.5 -skew-x-12" style={{ background: RACE_RED }} />
-          <span className="h-1.5 w-8 rounded-full bg-white/70" />
-        </div>
-        <div className="flex items-center gap-1.5">
-          {['w-4', 'w-5', 'w-4', 'w-5'].map((width, index) => (
-            <span key={index} className={`h-1 ${width} rounded-full bg-white/20`} />
-          ))}
-          <span className="ml-1 h-2.5 w-7 rounded-full" style={{ background: RACE_RED }} />
-        </div>
-      </div>
-
-      <div className="relative grid min-h-0 flex-1 grid-cols-[1fr_1.3fr] items-center gap-2 px-3">
-        <div>
-          <div className="flex gap-0.5">
-            {[0, 1, 2, 3, 4].map((light) => (
-              <span key={light} className="size-1.5 rounded-full" style={{ background: RACE_RED, boxShadow: `0 0 4px ${RACE_RED}` }} />
-            ))}
-          </div>
-          <div className="mt-2 h-2.5 w-full -skew-x-12 rounded-sm bg-white/85" />
-          <div className="mt-1 h-2.5 w-4/5 -skew-x-12 rounded-sm" style={{ background: RACE_RED }} />
-          <div className={`${line} mt-2.5 h-1 w-11/12`} />
-          <div className={`${line} mt-1 h-1 w-3/4`} />
-          <div className="mt-2.5 flex gap-1">
-            <span className="h-3 w-10 -skew-x-12 rounded-sm" style={{ background: RACE_RED }} />
-            <span className="h-3 w-9 -skew-x-12 rounded-sm ring-1 ring-white/30" />
-          </div>
-        </div>
-        <RaceCar className="w-full drop-shadow-[0_6px_10px_rgba(225,6,0,0.25)]" />
-      </div>
-
-      <div className="relative grid grid-cols-3 gap-1.5 px-3 pb-2.5">
-        <div className={`${panel} flex flex-col gap-1 p-1.5`}>
-          {[RACE_RED, 'rgba(255,255,255,0.6)', 'rgba(255,255,255,0.3)'].map((tone, index) => (
-            <div key={index} className="flex items-center gap-1">
-              <span className="size-1.5 rounded-sm" style={{ background: tone }} />
-              <span className={`${line} h-1 flex-1`} />
-            </div>
-          ))}
-        </div>
-        <div className={`${panel} p-1.5`}>
-          <div className="h-1 w-2/3 rounded-full" style={{ background: RACE_RED }} />
-          <div className="mt-1.5 grid grid-cols-3 gap-0.5">
-            {[0, 1, 2].map((unit) => (
-              <span key={unit} className="h-3 rounded-sm bg-white/10" />
-            ))}
-          </div>
-        </div>
-        <div className={`${panel} flex items-center gap-1.5 p-1.5`}>
-          <div className="flex -space-x-1">
-            {['from-white/60', 'from-[#e10600]', 'from-white/35'].map((tone) => (
-              <span key={tone} className={`size-3.5 rounded-full bg-gradient-to-br ${tone} to-[#18213a] ring-1 ring-[#070b18]`} />
-            ))}
-          </div>
-          <span className={`${line} h-1 flex-1`} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 const SCREENS = {
   dashboard: DashboardScreen,
   catalog: CatalogScreen,
   landing: LandingScreen,
   shop: ShopScreen,
   table: TableScreen,
-  racing: RacingScreen,
 };
 
-export default function ProjectMockup({ kind, className = '' }) {
+/**
+ * `image` (src, srcSet) shows a real preview picture, without the browser bar, in
+ * place of a drawn screen. It is decorative, since the card title names the project.
+ */
+export default function ProjectMockup({ kind, image, sizes = '(min-width: 1024px) 26rem, (min-width: 640px) 45vw, 92vw', className = '' }) {
   const Screen = SCREENS[kind] ?? LandingScreen;
 
   return (
     <div aria-hidden className={`overflow-hidden rounded-xl bg-[#0d0f0e] ring-1 ring-white/10 ${className}`}>
-      <div className="flex items-center gap-1 border-b border-white/10 px-2.5 py-1.5">
-        <span className="size-1.5 rounded-full bg-white/25" />
-        <span className="size-1.5 rounded-full bg-white/25" />
-        <span className="size-1.5 rounded-full bg-live/70" />
-        <span className="ml-1.5 h-1.5 w-1/3 rounded-full bg-white/10" />
-      </div>
+      {!image && (
+        <div className="flex items-center gap-1 border-b border-white/10 px-2.5 py-1.5">
+          <span className="size-1.5 rounded-full bg-white/25" />
+          <span className="size-1.5 rounded-full bg-white/25" />
+          <span className="size-1.5 rounded-full bg-live/70" />
+          <span className="ml-1.5 h-1.5 w-1/3 rounded-full bg-white/10" />
+        </div>
+      )}
       <div className="aspect-[16/9]">
-        <Screen />
+        {image ? (
+          <img
+            src={image.src}
+            srcSet={image.srcSet}
+            sizes={sizes}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="size-full object-cover"
+          />
+        ) : (
+          <Screen />
+        )}
       </div>
     </div>
   );

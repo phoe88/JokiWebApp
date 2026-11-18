@@ -1,3 +1,5 @@
+import vortexPreview from '../assets/vortex-racing-preview.webp';
+import vortexPreviewSmall from '../assets/vortex-racing-preview-640.webp';
 import {
   Bell,
   Bug,
@@ -62,6 +64,7 @@ export const PORTFOLIO_FILTERS = [ALL_PROJECTS, 'Dashboard', 'E-commerce', 'Land
  * so. Replace those entries with real projects as you collect them.
  * `previewUrl` is an in-app route; `siteUrl` is a live external site that opens in a
  * new tab. `description`, when present, replaces `summary` in the details modal.
+ * `image` swaps the drawn `mock` screen for a real preview picture.
  */
 export const PROJECTS = [
   {
@@ -93,9 +96,9 @@ export const PROJECTS = [
   },
   {
     id: 'vortex-racing',
-    title: 'Vortex Racing – Official Website',
+    title: 'Vortex Racing: Official Website',
     category: 'Landing Page',
-    mock: 'racing',
+    image: { src: vortexPreview, srcSet: `${vortexPreviewSmall} 640w, ${vortexPreview} 1024w` },
     summary:
       'An immersive Formula 1 team website showcasing drivers, racing news, championship standings, and upcoming Grand Prix events.',
     description:

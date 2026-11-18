@@ -31,7 +31,7 @@ function ProjectCard({ project, onDetails, index }) {
       style={{ animationDelay: `${index * 60}ms` }}
       className="animate__animated animate__fadeInUp animate__faster flex min-w-0 flex-col p-3"
     >
-      <ProjectMockup kind={project.mock} />
+      <ProjectMockup kind={project.mock} image={project.image} />
       <div className="flex flex-1 flex-col p-3 pt-4">
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs text-ink-dim">{project.category}</p>
@@ -63,7 +63,7 @@ function ProjectDetails({ project, onClose }) {
     <Modal open={Boolean(project)} onClose={onClose} title={project?.title} icon={FolderCode} wide>
       {project && (
         <>
-          <ProjectMockup kind={project.mock} />
+          <ProjectMockup kind={project.mock} image={project.image} />
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <p className="text-sm text-ink-dim">{project.category}</p>
             {project.sample && <SampleTag />}
